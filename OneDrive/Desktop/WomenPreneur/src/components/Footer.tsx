@@ -3,7 +3,7 @@ import { Sparkles, Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-r
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
-  return (
+return (
     <footer className="bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 dark:from-gray-950 dark:via-purple-950/30 dark:to-gray-900 text-gray-900 dark:text-gray-100 py-16 px-6 border-t border-pink-100/60 dark:border-pink-500/20">
       <div className="max-w-7xl mx-auto space-y-12">
         <div className="grid md:grid-cols-4 gap-12">

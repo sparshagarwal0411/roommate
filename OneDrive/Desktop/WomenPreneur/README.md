@@ -150,3 +150,6 @@ Follow `GROQ_SETUP.md` to:
 If you share this project or deploy it, consider updating this `README` with deployment-specific steps (e.g. Vercel, Netlify, Render) and real production environment variable values.
 
 
+
+
+

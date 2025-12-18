@@ -16,7 +16,7 @@ const stats = [
   { label: "Women supported", value: "25K+", accent: "from-pink-400 to-rose-500" },
   { label: "Communities reached", value: "120+", accent: "from-rose-800 to-purple-500" },
   { label: "Avg. revenue lift", value: "38%", accent: "from-pink-400 to-rose-800" },
-  { label: "Mentor hours served", value: "48K", accent: "from-rose-400 to-purple-900" },
+  { label: "Mentor hours served", value: "48K", accent: "from-rose-400 to-purple-900"}
 ];
 
 const values = [
@@ -89,8 +89,10 @@ export default function About() {
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/finance"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-lg hover:scale-[1.02] transition"
-              >
+className="inline-flex items-center gap-2 px-5 py-3 rounded-xl
+  bg-gradient-to-r from-pink-500 to-purple-600
+  dark:from-purple-600 dark:to-pink-500
+  text-white font-semibold shadow-lg hover:scale-[1.02] transition"              >
                 Explore Finance Toolkit <ArrowUpRight className="w-5 h-5" />
               </Link>
               <Link

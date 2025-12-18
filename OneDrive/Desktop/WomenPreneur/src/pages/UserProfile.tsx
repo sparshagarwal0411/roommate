@@ -30,15 +30,16 @@ export function UserProfile({ darkMode, toggleDarkMode }: UserProfileProps) {
   const stats = [
     { icon: TrendingUp, label: 'Schemes Applied', value: '0' },
     { icon: Award, label: 'Storefronts Created', value: '0' },
-    { icon: Calendar, label: 'Member Since', value: new Date().toLocaleDateString() },
+    { icon: Calendar, label: 'Member Since', value: "5/12/2025" },
   ];
 
   const quickLinks = [
     { name: 'Scheme Finder', href: '/scheme-finder', description: 'Discover government schemes and grants' },
     { name: 'Storefront Builder', href: '/storefront', description: 'Create your digital storefront' },
-    { name: 'Mentorship Network', href: '/mentorship', description: 'Connect with experienced mentors' },
+    { name: 'Mentorship Network', href: '/connect', description: 'Connect with other users and experienced mentors' },
     { name: 'Finance Toolkit', href: '/finance', description: 'Manage your finances and track expenses' },
     { name: 'Skill Up', href: '/skill-up', description: 'Enhance your skills with expert-led courses' },
+    { name: 'Grants', href: '/grants', description: 'Explore available grants for your business' },
   ];
 
   return (
