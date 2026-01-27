@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RoomMate Design System - Soft, friendly hostel vibes */
+
+@layer base {
+  :root {
+    /* Warm cream background */
+    --background: 40 33% 98%;
+    --foreground: 220 20% 20%;
+
+    /* Cards with subtle warmth */
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 20%;
+
+    /* Mint green primary - fresh and friendly */
+    --primary: 158 64% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft lavender secondary */
+    --secondary: 260 30% 95%;
+    --secondary-foreground: 260 40% 35%;
+
+    /* Muted tones */
+    --muted: 40 20% 94%;
+    --muted-foreground: 220 10% 50%;
+
+    /* Coral accent - warm and inviting */
+    --accent: 12 80% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Warning/destructive */
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 220 15% 90%;
+    --input: 220 15% 90%;
+    --ring: 158 64% 45%;
+
+    --radius: 1rem;
+
+    /* Sidebar (matching main theme) */
+    --sidebar-background: 40 33% 98%;
+    --sidebar-foreground: 220 20% 20%;
+    --sidebar-primary: 158 64% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 30% 95%;
+    --sidebar-accent-foreground: 260 40% 35%;
+    --sidebar-border: 220 15% 90%;
+    --sidebar-ring: 158 64% 45%;
+
+    /* Custom tokens for RoomMate */
+    --success: 158 64% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+    --info: 200 80% 55%;
+    --info-foreground: 0 0% 100%;
+
+    /* Category colors */
+    --food: 66 99% 42%;
+    --groceries: 145 70% 42%;
+    --utilities: 225 80% 25%;
+    --entertainment: 270 50% 38%;
+    --transport: 35 95% 52%;
+    --shopping: 335 75% 45%;
+    --other: 0 0% 88%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(158 64% 45%) 0%, hsl(180 60% 45%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(12 80% 65%) 0%, hsl(25 85% 60%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(158 64% 45%) 0%, hsl(200 80% 55%) 50%, hsl(260 60% 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(40 33% 98%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(220 20% 20% / 0.08);
+    --shadow-card: 0 8px 30px -8px hsl(220 20% 20% / 0.12);
+    --shadow-elevated: 0 20px 50px -15px hsl(220 20% 20% / 0.15);
+    --shadow-glow: 0 0 40px -10px hsl(158 64% 45% / 0.3);
+  }
+
+  .dark {
+    /* Dark slate background */
+    --background: 220 20% 10%;
+    --foreground: 40 20% 95%;
+
+    --card: 220 20% 14%;
+    --card-foreground: 40 20% 95%;
+
+    --popover: 220 20% 14%;
+    --popover-foreground: 40 20% 95%;
+
+    /* Brighter mint for dark mode */
+    --primary: 158 64% 55%;
+    --primary-foreground: 220 20% 10%;
+
+    --secondary: 260 25% 22%;
+    --secondary-foreground: 260 30% 85%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 12 75% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 158 64% 55%;
+
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 40 20% 95%;
+    --sidebar-primary: 158 64% 55%;
+    --sidebar-primary-foreground: 220 20% 10%;
+    --sidebar-accent: 260 25% 22%;
+    --sidebar-accent-foreground: 260 30% 85%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 158 64% 55%;
+
+    --success: 158 64% 55%;
+    --warning: 38 85% 60%;
+    --info: 200 75% 60%;
+
+    --food: 62 97% 53%;
+    --groceries: 120 100% 50%;
+    --utilities: 180 100% 50%;
+    --entertainment: 300 100% 36%;
+    --transport: 15 100% 53%;
+    --shopping: 330 100% 71%;
+    --other: 220 10% 70%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(158 64% 55%) 0%, hsl(180 55% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(12 75% 60%) 0%, hsl(25 80% 55%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(158 64% 55%) 0%, hsl(200 75% 60%) 50%, hsl(260 55% 65%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(220 20% 14%) 0%, hsl(220 20% 12%) 100%);
+
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-card: 0 8px 30px -8px hsl(0 0% 0% / 0.4);
+    --shadow-elevated: 0 20px 50px -15px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 40px -10px hsl(158 64% 55% / 0.25);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-xl bg-white/80 dark:bg-slate-900/80;
+  }
+
+  .text-gradient {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Animation utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes pulse-soft {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.7;
+    }
+  }
+}
