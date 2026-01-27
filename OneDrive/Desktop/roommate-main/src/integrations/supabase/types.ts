@@ -22,6 +22,7 @@ export type Database = {
           description: string | null
           hostel_id: string
           id: string
+          image_url: string | null
           paid_by_member_id: string
           split_equally: boolean | null
           participants: string[] | null
@@ -33,6 +34,7 @@ export type Database = {
           description?: string | null
           hostel_id: string
           id?: string
+          image_url?: string | null
           paid_by_member_id: string
           split_equally?: boolean | null
           participants?: string[] | null
@@ -44,6 +46,7 @@ export type Database = {
           description?: string | null
           hostel_id?: string
           id?: string
+          image_url?: string | null
           paid_by_member_id?: string
           split_equally?: boolean | null
           participants?: string[] | null
@@ -249,6 +252,78 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          id: string
+          hostel_id: string
+          recipient_id: string
+          sender_id: string
+          actor_name: string
+          type: Database["public"]["Enums"]["notification_type"]
+          content: string
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          hostel_id: string
+          recipient_id: string
+          sender_id: string
+          actor_name: string
+          type: Database["public"]["Enums"]["notification_type"]
+          content: string
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          hostel_id?: string
+          recipient_id?: string
+          sender_id?: string
+          actor_name?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          content?: string
+          is_read?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      recurring_bills: {
+        Row: {
+          id: string
+          hostel_id: string
+          bill_type: string
+          amount: number
+          target_room: string
+          description: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hostel_id: string
+          bill_type: string
+          amount: number
+          target_room: string
+          description?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hostel_id?: string
+          bill_type?: string
+          amount?: number
+          target_room?: string
+          description?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string
@@ -301,7 +376,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_monthly_bills: {
+        Args: {
+          hostel_id_param: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       expense_category:
@@ -312,6 +392,11 @@ export type Database = {
       | "transport"
       | "shopping"
       | "other"
+      notification_type:
+      | "bill"
+      | "payment"
+      | "reminder"
+      | "broadcast"
     }
     CompositeTypes: {
       [_ in never]: never

@@ -31,6 +31,7 @@ export interface Expense {
   description: string | null;
   split_equally: boolean;
   participants: string[] | null;
+  image_url: string | null;
   created_at: string;
 }
 
@@ -868,7 +869,9 @@ export const useGenerateMonthlyBills = () => {
 
   return useMutation({
     mutationFn: async (hostelId: string) => {
-      const { data, error } = await supabase.rpc('generate_monthly_bills');
+      const { data, error } = await supabase.rpc('generate_monthly_bills', {
+        hostel_id_param: hostelId
+      });
 
       if (error) throw error;
       return data;

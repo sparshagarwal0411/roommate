@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Building2, Plus, Users, ArrowRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
-import { HostelDialog } from "@/components/HostelDialog";
 import { toast } from "sonner";
 
 interface JoinedHostel {
@@ -22,7 +21,6 @@ const Lobby = () => {
     const [loading, setLoading] = useState(true);
     const [userName, setUserName] = useState("");
     const [userId, setUserId] = useState<string | null>(null);
-    const [showHostelDialog, setShowHostelDialog] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -113,9 +111,11 @@ const Lobby = () => {
             <header className="sticky top-0 z-50 glass border-b">
                 <div className="container flex items-center justify-between h-16">
                     <button onClick={() => navigate("/")} className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
-                        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                            <Building2 className="h-5 w-5 text-primary-foreground" />
-                        </div>
+                        <img
+                            src="/ChatGPT Image Jan 15, 2026, 09_03_32 PM.png"
+                            alt="RoomMate Logo"
+                            className="w-12 h-12 object-contain"
+                        />
                         <span className="font-bold text-xl">RoomMate</span>
                     </button>
                     <div className="flex items-center gap-4">
@@ -138,7 +138,7 @@ const Lobby = () => {
                     <Card
                         variant="interactive"
                         className="flex flex-col items-center justify-center p-8 border-dashed border-2 cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => setShowHostelDialog(true)}
+                        onClick={() => navigate("/")}
                     >
                         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                             <Plus className="h-8 w-8 text-primary" />
@@ -188,21 +188,6 @@ const Lobby = () => {
                     </div>
                 )}
             </main>
-
-            {/* Hostel Dialog */}
-            {showHostelDialog && (
-                <HostelDialog
-                    userId={userId}
-                    onHostelCreated={() => {
-                        setShowHostelDialog(false);
-                        fetchUserData();
-                    }}
-                    onHostelJoined={() => {
-                        setShowHostelDialog(false);
-                        fetchUserData();
-                    }}
-                />
-            )}
         </div>
     );
 };

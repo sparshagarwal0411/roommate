@@ -1,9 +1,16 @@
-import { Receipt, Utensils, ShoppingCart, Zap, Film, Car, MoreHorizontal, Trash2 } from "lucide-react";
+import { Receipt, Utensils, ShoppingCart, Zap, Film, Car, MoreHorizontal, Trash2, Image as ImageIcon, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Member, Expense, useDeleteExpense } from "@/hooks/useHostel";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ExpensesListProps {
   expenses: Expense[];
@@ -97,6 +104,43 @@ export const ExpensesList = ({ expenses, members, hostelId }: ExpensesListProps)
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
+
+              {expense.image_url && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10 shrink-0"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-lg">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <ImageIcon className="h-5 w-5" />
+                        Receipt for {expense.description || expense.category}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-4 rounded-xl overflow-hidden border">
+                      <img
+                        src={expense.image_url}
+                        alt="Receipt"
+                        className="w-full h-auto object-contain max-h-[70vh]"
+                      />
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <Button variant="outline" asChild>
+                        <a href={expense.image_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                          <ExternalLink className="h-4 w-4" />
+                          Open Original
+                        </a>
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           );
         })}

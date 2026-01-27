@@ -24,6 +24,7 @@ import { NotificationBell } from "./NotificationBell";
 import { NotificationPopup } from "./NotificationPopup";
 import { BroadcastDialog } from "./BroadcastDialog";
 import { MonthlySummary, MonthlySummaryButton } from "./MonthlySummary";
+import { AISpendingAdvisor } from "./AISpendingAdvisor";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import {
@@ -237,21 +238,21 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
   // Budget Alert Notifications
   useEffect(() => {
     if (!isOwner || !currentBudget || currentBudget === 0 || selectedMonth) return;
-    
+
     const spendingPercentage = (totalSpent / currentBudget) * 100;
     const monthKey = activeMonth;
-    
+
     const alertThresholds = [75, 90];
-    
+
     alertThresholds.forEach((threshold) => {
       if (spendingPercentage >= threshold && !alertedThresholds[monthKey]?.has(threshold)) {
         const icon = threshold === 75 ? "🟠" : "🔴";
-        const message = threshold === 75 
+        const message = threshold === 75
           ? `Budget Alert! You've spent 75% of your budget (₹${Math.floor(totalSpent)}/₹${Math.floor(currentBudget)})`
           : `Warning! You've spent 90% of your budget (₹${Math.floor(totalSpent)}/₹${Math.floor(currentBudget)})`;
-        
+
         toast.warning(`${icon} ${message}`);
-        
+
         setAlertedThresholds(prev => ({
           ...prev,
           [monthKey]: new Set([...(prev[monthKey] || new Set()), threshold])
@@ -287,10 +288,14 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
         <div className="container flex items-center justify-between h-16 gap-4">
           <div className="flex items-center gap-2 overflow-hidden">
             <div
-              className="p-2 bg-primary/10 rounded-xl cursor-pointer hover:bg-primary/20 transition-colors"
+              className="cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/')}
             >
-              <Building2 className="h-6 w-6 text-primary" />
+              <img
+                src="/ChatGPT Image Jan 15, 2026, 09_03_32 PM.png"
+                alt="RoomMate Logo"
+                className="w-12 h-12 object-contain"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
@@ -471,7 +476,14 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
 
             {/* Calculations and Charts */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 space-y-6">
+                <AISpendingAdvisor
+                  hostel={hostel!}
+                  expenses={filteredExpenses}
+                  members={members}
+                  currentMemberId={me?.id}
+                  totalSpent={totalSpent}
+                />
                 <BalanceSummary
                   members={members}
                   expenses={filteredExpenses}
@@ -519,6 +531,13 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
           </>
         )}
       </main>
+      <AISpendingAdvisor
+        hostel={hostel!}
+        expenses={filteredExpenses}
+        members={members}
+        currentMemberId={me?.id}
+        totalSpent={totalSpent}
+      />
       <ScrollToTop />
       <Footer />
     </div>

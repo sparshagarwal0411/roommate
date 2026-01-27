@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Receipt, Utensils, ShoppingCart, Zap, Film, Car, ShoppingBag, MoreHorizontal } from "lucide-react";
+import { Plus, Receipt, Utensils, ShoppingCart, Zap, Film, Car, ShoppingBag, MoreHorizontal, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Member, useAddExpense, useAddNotification } from "@/hooks/useHostel";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,6 +49,8 @@ export const ExpenseForm = ({ members, hostelId }: ExpenseFormProps) => {
   const [paidBy, setPaidBy] = useState<string>("");
   const [description, setDescription] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const addExpense = useAddExpense();
   const addNotification = useAddNotification();
@@ -79,6 +83,7 @@ export const ExpenseForm = ({ members, hostelId }: ExpenseFormProps) => {
         description: description.trim() || null,
         split_equally: participants.length === 0 || participants.length === members.length,
         participants: participants.length > 0 ? participants : null,
+        image_url: imageUrl,
       });
 
       // Send notifications to participants
@@ -116,6 +121,7 @@ export const ExpenseForm = ({ members, hostelId }: ExpenseFormProps) => {
     setPaidBy("");
     setDescription("");
     setParticipants([]);
+    setImageUrl(null);
   };
 
   const toggleParticipant = (memberId: string) => {
@@ -138,6 +144,95 @@ export const ExpenseForm = ({ members, hostelId }: ExpenseFormProps) => {
       // Otherwise, ensure the new payer is included
       return prev.includes(value) ? prev : [...prev, value];
     });
+  };
+
+  const handleScanReceipt = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      toast.error("Gemini API key is missing! 🔑");
+      return;
+    }
+
+    setIsScanning(true);
+    toast.info("Scanning receipt... 📸");
+
+    try {
+      // Convert file to base64
+      const readFileAsBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64String = (reader.result as string).split(',')[1];
+            resolve(base64String);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      };
+
+      const base64Data = await readFileAsBase64(file);
+      const genAI = new GoogleGenerativeAI(apiKey);
+      // Using gemini-2.0-flash as requested by the user who refers to it as 2.5
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const prompt = `Analyze this receipt image and extract the following details in JSON format. 
+      JSON structure:
+      {
+        "amount": number,
+        "category": "food" | "groceries" | "utilities" | "entertainment" | "transport" | "shopping" | "other",
+        "description": string
+      }
+      
+      Requirements:
+      - Amount should be the total.
+      - Category must be one of the specified strings.
+      - Description should be short (max 5 words).
+      - Reply ONLY with the JSON.`;
+
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: file.type
+          }
+        }
+      ]);
+
+      const response = await result.response;
+      const text = response.text();
+      const cleanedJson = text.replace(/```json|```/g, "").trim();
+      const data = JSON.parse(cleanedJson);
+
+      if (data.amount) setAmount(data.amount.toString());
+      if (data.category) setCategory(data.category);
+      if (data.description) setDescription(data.description);
+
+      // Upload to Supabase Storage
+      const fileName = `${hostelId}/${Date.now()}-${file.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('receipts')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('receipts')
+        .getPublicUrl(fileName);
+
+      setImageUrl(publicUrl);
+      toast.success("Receipt scanned and uploaded! 🎉");
+    } catch (error) {
+      console.error("OCR Error:", error);
+      toast.error("Failed to scan receipt. Please enter manually. 📋");
+    } finally {
+      setIsScanning(false);
+      // Reset input
+      e.target.value = "";
+    }
   };
 
   return (
@@ -178,9 +273,37 @@ export const ExpenseForm = ({ members, hostelId }: ExpenseFormProps) => {
             New Expense
           </DialogTitle>
           <DialogDescription>
-            Add a shared expense to split with all hostel members
+            Add a shared expense or scan a receipt to auto-fill details
           </DialogDescription>
         </DialogHeader>
+
+        <div className="mt-2">
+          <label htmlFor="receipt-upload" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2 border-dashed border-2 py-6 hover:border-primary hover:bg-primary/5 transition-all"
+              disabled={isScanning}
+              asChild
+            >
+              <span>
+                {isScanning ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+                {isScanning ? "Scanning..." : "Scan Receipt (AI)"}
+              </span>
+            </Button>
+            <input
+              id="receipt-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleScanReceipt}
+              disabled={isScanning}
+            />
+          </label>
+        </div>
 
         <ScrollArea className="max-h-[80vh] overflow-y-auto pr-4 -mr-4">
           <form onSubmit={handleSubmit} className="space-y-3 pt-4">

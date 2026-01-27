@@ -21,8 +21,8 @@ const ProfileSetup = () => {
     // --- GRID SHAPE GENERATOR ---
     const shapes = useMemo(() => {
         const items = [];
-        const columns = 20; 
-        const rows = 20;    
+        const columns = 12; 
+        const rows = 12;    
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < columns; col++) {

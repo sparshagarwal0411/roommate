@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Zap, Wifi, Home, Plus, Check, Circle } from "lucide-react";
+import { Zap, Wifi, Home, Plus, Check, Circle, BellRing } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -163,7 +163,7 @@ export const UtilityBills = ({ bills, hostelId, memberCount, isOwner, members, c
         hostel_id: hostelId,
         amount: Number(selectedBill.amount),
         category: "utilities",
-        description: `Bill: ${selectedBill.bill_type} (${selectedBill.month})`,
+        description: `Bill: ${selectedBill.bill_type.split("|")[0]} (${selectedBill.month})`,
         paid_by_member_id: paidBy,
         split_equally: true,
         participants: splitParticipants,
@@ -182,6 +182,32 @@ export const UtilityBills = ({ bills, hostelId, memberCount, isOwner, members, c
     } catch (error) {
       console.error(error);
       toast.error("Failed to settle bill");
+    }
+  };
+
+  const handleSendReminder = async (bill: UtilityBill) => {
+    try {
+      const [type, roomNum] = bill.bill_type.split("|");
+      const label = billTypes.find(b => b.value === type)?.label || type;
+      const roommatesInRoom = members.filter(m => m.room_no === roomNum && m.profile_id);
+
+      const reminders = roommatesInRoom
+        .filter(m => m.id !== currentMemberId)
+        .map(recipient => {
+          return addNotification.mutateAsync({
+            hostel_id: hostelId,
+            recipient_id: recipient.id,
+            sender_id: currentMemberId || "",
+            actor_name: me?.name || "Hostel Owner",
+            type: 'reminder',
+            content: `Friendly reminder: The ${label} bill for Room ${roomNum} (₹${bill.amount}) is pending! 📅`,
+          });
+        });
+
+      await Promise.all(reminders);
+      toast.success(`Reminders sent to ${reminders.length} roommates! 🔔`);
+    } catch (error) {
+      toast.error("Failed to send reminders");
     }
   };
 
@@ -375,22 +401,37 @@ export const UtilityBills = ({ bills, hostelId, memberCount, isOwner, members, c
                   </div>
 
                   {isOwner && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTogglePaid(bill);
-                      }}
-                      disabled={togglePaid.isPending}
-                    >
-                      {bill.paid ? (
-                        <Check className="h-5 w-5 text-success" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex items-center gap-1">
+                      {!bill.paid && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-warning hover:text-warning hover:bg-warning/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSendReminder(bill);
+                          }}
+                        >
+                          <BellRing className="h-4 w-4" />
+                        </Button>
                       )}
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTogglePaid(bill);
+                        }}
+                        disabled={togglePaid.isPending}
+                      >
+                        {bill.paid ? (
+                          <Check className="h-5 w-5 text-success" />
+                        ) : (
+                          <Circle className="h-5 w-5 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
                   )}
                   {!isOwner && bill.paid && (
                     <Check className="h-5 w-5 text-success shrink-0" />

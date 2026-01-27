@@ -82,9 +82,16 @@ Scenario: Groceries Purchase
 ### 📊 Financial Insights
 - **Balance Summary**: Visual "Who Owes Whom" overview with red/green status indicators
 - **Spending Charts**: Analyze expense trends and category breakdowns
+- **Budget Alerts**: Real-time warnings when approaching or exceeding monthly limits
+- **Recurring Bills**: Automate monthly expenses like WiFi, Rent, and Electricity
 - **Monthly History**: Review past months' transactions and settlements
 - **Settlement Tracking**: Mark debts as paid with persistent transaction history
-- **Utility Bill Management**: Track utility expenses and split accordingly
+
+### 🤖 Smart AI Assistance
+- **Roomie AI Advisor**: Personalized budget advice and spending analysis
+- **Gemini Powered**: Leveraging Google's Gemini-2.5-flash for intelligent insights
+- **Interactive Chat**: Ask questions about your spending patterns and get saving tips
+- **Visual Status**: Instant feedback on your hostel's financial health (🟢, 🟡, 🔴)
 
 ### 🔔 Collaboration & Communication
 - **Real-time Notifications**: Get instant alerts for new expenses, settlements, and reminders
@@ -108,7 +115,10 @@ Scenario: Groceries Purchase
 
 ## 🚀 Recent Updates
 
+- **AI Advisor Integration**: Smart budget assistant powered by Google Gemini
+- **Automated Recurring Bills**: Monthly automation for fixed expenses
 - **Enhanced Financial Tracking**: Income tracking and selective expense splitting
+- **Budget Alert System**: Visual warnings for over-budget scenarios
 - **Settlement System**: Mark debts as received with historical tracking
 - **Visual Indicators**: Red/green color coding for pending vs settled transactions
 - **Personalized Dashboard**: Welcome section with user and room information
@@ -122,6 +132,7 @@ Scenario: Groceries Purchase
 
 ### Frontend
 - **React 18** with **TypeScript** for type-safe UI development
+- **Google Gemini AI** (Gemini-2.5-flash) for smart financial advisory
 - **Vite** for fast development and optimized builds
 - **Tailwind CSS** for utility-first styling
 - **shadcn/ui** for accessible, customizable component library
@@ -283,6 +294,7 @@ src/
    ```env
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_GEMINI_API_KEY=your_gemini_api_key
    ```
 
 4. **Run database migrations**
@@ -384,3 +396,4 @@ Contributions are welcome! Please feel free to submit pull requests for bug fixe
 ---
 
 Made with ❤️ for hostel life.
+A Broken Table product.
