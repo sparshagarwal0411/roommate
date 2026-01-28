@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Building2, Users, Receipt, PieChart, Sparkles, Wallet, Calculator, Bell, Heart, Star, ArrowRight, CheckCircle2, Coffee, Utensils, Wifi, Zap, Car, Cake, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -689,35 +689,6 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           </div>
         </div>
 
-        {/* How it works */}
-        <div id="how-it-works-section" className="mb-32 max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">How it works ✨</h2>
-          <p className="text-xl text-muted-foreground text-center mb-16">
-            Get started in under 30 seconds
-          </p>
-          <div className="grid md:grid-cols-4 gap-10">
-            {[
-              { step: "1", title: "Create hostel", desc: "Get a unique 6-digit code", icon: Building2 },
-              { step: "2", title: "Share code", desc: "Send it to your roommates", icon: Users },
-              { step: "3", title: "Add expenses", desc: "Track who paid for what", icon: Receipt },
-              { step: "4", title: "See balances", desc: "Know who owes whom", icon: Calculator },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className={`text-center opacity-0 ${howItWorksVisible ? "animate-bounce-in opacity-100" : ""}`}
-                style={{ animationDelay: `${i * 150}ms` }}
-              >
-                <div className="w-16 h-16 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center font-bold text-2xl mx-auto mb-6 relative z-10">
-                  {item.step}
-                  <div className="absolute -inset-1 blur-lg bg-primary/30 -z-10 rounded-full"></div>
-                </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-base text-muted-foreground">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Testimonials */}
         <div className="mb-32" id="testimonials-section">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Loved by students 💜</h2>
@@ -802,7 +773,6 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             <HostelDialog
-              isOpen={true}
               open={true}
               onHostelJoined={onHostelJoined}
               onClose={() => setMode('landing')}

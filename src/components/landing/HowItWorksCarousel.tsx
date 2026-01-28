@@ -1,17 +1,16 @@
-import React from "react";
+import * as React from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Building2,
-    Users,
     Receipt,
     PieChart,
-    Sparkles,
-    Calculator,
     Handshake,
     ArrowRight,
     CheckCircle2,
-    Lock,
     Bell,
-    Wallet
+    Wallet,
+    ChevronLeft,
+    ChevronRight
 } from "lucide-react";
 import {
     Carousel,
@@ -19,9 +18,11 @@ import {
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
+    type CarouselApi
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const slides = [
     {
@@ -29,23 +30,24 @@ const slides = [
         step: "01",
         description: "Launch your hostel in seconds. Get a unique 6-digit code for your room.",
         icon: Building2,
-        color: "from-emerald-500/20 to-teal-500/20",
+        color: "from-emerald-500 to-teal-600",
+        lightColor: "bg-emerald-500/10",
         iconColor: "text-emerald-500",
         visual: (
-            <div className="relative w-full h-full flex items-center justify-center p-6">
-                <div className="glass p-6 rounded-2xl border-2 border-emerald-500/20 shadow-xl animate-float">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-emerald-500" />
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="glass p-6 rounded-2xl border-2 border-emerald-500/20 shadow-2xl animate-float bg-white/10 backdrop-blur-md">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                            <Building2 className="w-6 h-6 text-emerald-500" />
                         </div>
                         <div>
-                            <div className="text-xs font-medium text-muted-foreground uppercase">Hostel Code</div>
-                            <div className="text-2xl font-bold tracking-widest text-emerald-600 dark:text-emerald-400">I4Y 6I9</div>
+                            <div className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest">Share this Code</div>
+                            <div className="text-3xl font-black tracking-tighter text-emerald-600 dark:text-emerald-400">I4Y 6I9</div>
                         </div>
                     </div>
-                    <div className="space-y-2 opacity-60">
-                        <div className="h-2 w-32 bg-muted rounded-full" />
-                        <div className="h-2 w-24 bg-muted rounded-full" />
+                    <div className="space-y-2 opacity-30">
+                        <div className="h-2 w-32 bg-emerald-500 rounded-full" />
+                        <div className="h-2 w-24 bg-emerald-500 rounded-full" />
                     </div>
                 </div>
             </div>
@@ -56,29 +58,30 @@ const slides = [
         step: "02",
         description: "Log expenses instantly. No more forgetting who paid for the weekend chai or movie snacks.",
         icon: Receipt,
-        color: "from-blue-500/20 to-indigo-500/20",
+        color: "from-blue-500 to-indigo-600",
+        lightColor: "bg-blue-500/10",
         iconColor: "text-blue-500",
         visual: (
-            <div className="relative w-full h-full flex items-center justify-center p-6">
-                <div className="glass p-5 rounded-2xl border-2 border-blue-500/20 shadow-xl w-full max-w-[240px] animate-float" style={{ animationDelay: "200ms" }}>
-                    <div className="text-sm font-bold mb-3 flex items-center justify-between">
-                        <span>New Expense</span>
-                        <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/10 border-none text-[10px]">Recent</Badge>
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="glass p-5 rounded-2xl border-2 border-blue-500/20 shadow-2xl w-full max-w-[240px] animate-float-delayed bg-white/10 backdrop-blur-md">
+                    <div className="text-sm font-black mb-4 flex items-center justify-between">
+                        <span className="text-blue-500">Add Bill</span>
+                        <Badge className="bg-blue-500 text-white border-none text-[10px] px-2 py-0">New</Badge>
                     </div>
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-blue-500/5">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-500">☕</div>
-                                <div className="text-xs font-medium">Morning Chai</div>
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-blue-500/5 border border-blue-500/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-500 text-lg">☕</div>
+                                <div className="text-xs font-bold text-blue-700/80 dark:text-blue-300">Chai Break</div>
                             </div>
-                            <div className="text-xs font-bold text-blue-600">₹120</div>
+                            <div className="text-sm font-black text-blue-600">₹120</div>
                         </div>
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">🍜</div>
-                                <div className="text-xs font-medium">Maggi</div>
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-lg">🍜</div>
+                                <div className="text-xs font-bold opacity-60">Maggi Party</div>
                             </div>
-                            <div className="text-xs font-bold">₹80</div>
+                            <div className="text-sm font-black">₹85</div>
                         </div>
                     </div>
                 </div>
@@ -90,20 +93,22 @@ const slides = [
         step: "03",
         description: "Real-time balance summaries. Know exactly what you're owed and what you owe.",
         icon: PieChart,
-        color: "from-purple-500/20 to-pink-500/20",
+        color: "from-purple-500 to-fuchsia-600",
+        lightColor: "bg-purple-500/10",
         iconColor: "text-purple-500",
         visual: (
-            <div className="relative w-full h-full flex items-center justify-center p-6">
-                <div className="glass p-5 rounded-2xl border-2 border-purple-500/20 shadow-xl w-full max-w-[240px] animate-float" style={{ animationDelay: "400ms" }}>
-                    <div className="text-sm font-bold mb-4">Balance Summary</div>
-                    <div className="space-y-3">
-                        <div className="text-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                            <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium uppercase">You get back</div>
-                            <div className="text-xl font-bold text-emerald-600">₹450</div>
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="glass p-6 rounded-3xl border-2 border-purple-500/20 shadow-2xl w-full max-w-[250px] animate-float bg-white/10 backdrop-blur-md">
+                    <div className="text-sm font-black mb-4 text-purple-500 uppercase tracking-wider">Settlements</div>
+                    <div className="space-y-4">
+                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 relative overflow-hidden group">
+                            <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest mb-1">To Receive</div>
+                            <div className="text-2xl font-black text-emerald-600 tracking-tighter">₹450</div>
+                            <div className="absolute right-[-10px] bottom-[-10px] w-12 h-12 bg-emerald-500/10 rounded-full blur-xl" />
                         </div>
-                        <div className="text-center p-3 rounded-xl bg-destructive/10 border border-destructive/20">
-                            <div className="text-[10px] text-destructive font-medium uppercase">You owe</div>
-                            <div className="text-xl font-bold text-destructive">₹120</div>
+                        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 relative overflow-hidden">
+                            <div className="text-[10px] text-rose-600 dark:text-rose-400 font-black uppercase tracking-widest mb-1">To Pay</div>
+                            <div className="text-2xl font-black text-rose-600 tracking-tighter">₹120</div>
                         </div>
                     </div>
                 </div>
@@ -111,28 +116,33 @@ const slides = [
         )
     },
     {
-        title: "Instant Settlement",
+        title: "Instant Settle",
         step: "04",
         description: "Settle debts with a click. Clear the air and keep friendships stress-free.",
         icon: Handshake,
-        color: "from-amber-500/20 to-orange-500/20",
+        color: "from-amber-400 to-orange-600",
+        lightColor: "bg-amber-500/10",
         iconColor: "text-amber-500",
         visual: (
-            <div className="relative w-full h-full flex items-center justify-center p-6">
-                <div className="glass p-5 rounded-2xl border-2 border-amber-500/20 shadow-xl w-full max-w-[240px] animate-float" style={{ animationDelay: "600ms" }}>
-                    <div className="flex flex-col items-center text-center gap-3">
-                        <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center relative">
-                            <Handshake className="w-8 h-8 text-amber-500 animate-pulse" />
-                            <div className="absolute -top-1 -right-1">
-                                <CheckCircle2 className="w-6 h-6 text-emerald-500 fill-background" />
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="glass p-6 rounded-[2rem] border-2 border-amber-500/20 shadow-2xl w-full max-w-[240px] animate-float bg-white/10 backdrop-blur-md">
+                    <div className="flex flex-col items-center text-center gap-4">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500/30 to-orange-500/30 flex items-center justify-center relative shadow-inner">
+                            <Handshake className="w-10 h-10 text-amber-500 animate-pulse" />
+                            <div className="absolute top-0 right-0">
+                                <div className="bg-emerald-500 rounded-full p-1.5 shadow-lg border-2 border-white dark:border-card">
+                                    <CheckCircle2 className="w-5 h-5 text-white" />
+                                </div>
                             </div>
                         </div>
                         <div>
-                            <div className="text-sm font-bold">Settled Up!</div>
-                            <div className="text-xs text-muted-foreground mt-1">Transaction confirmed</div>
+                            <div className="text-lg font-black text-amber-600">All Cleared!</div>
+                            <div className="text-[10px] font-bold opacity-60 mt-1 uppercase tracking-widest">Transaction #992-BX</div>
                         </div>
-                        <div className="w-full h-px bg-border my-1" />
-                        <div className="text-[10px] font-mono opacity-50">#SETTLE-992-BX</div>
+                        <div className="grid grid-cols-2 gap-4 w-full mt-2">
+                            <div className="h-1 bg-amber-500/20 rounded-full" />
+                            <div className="h-1 bg-amber-500/20 rounded-full" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,27 +153,30 @@ const slides = [
         step: "05",
         description: "Never miss a beat. Get instant notifications when someone adds an expense or settles up.",
         icon: Bell,
-        color: "from-rose-500/20 to-red-500/20",
+        color: "from-rose-500 to-pink-600",
+        lightColor: "bg-rose-500/10",
         iconColor: "text-rose-500",
         visual: (
-            <div className="relative w-full h-full flex items-center justify-center p-6">
-                <div className="glass p-4 rounded-2xl border-2 border-rose-500/20 shadow-xl w-full max-w-[240px] animate-float" style={{ animationDelay: "800ms" }}>
-                    <div className="flex items-center gap-3 p-2 rounded-xl bg-rose-500/5 mb-2 border border-rose-500/10">
-                        <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center">
-                            <Bell className="w-4 h-4 text-rose-500" />
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="glass p-5 rounded-3xl border-2 border-rose-500/20 shadow-2xl w-full max-w-[240px] animate-float-delayed bg-white/10 backdrop-blur-md">
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-4 p-3 rounded-2xl bg-white/10 shadow-lg border border-white/20 transform rotate-1">
+                            <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/40">
+                                <Bell className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-[10px] font-black text-rose-500">NEW EXPENSE</div>
+                                <div className="text-xs font-bold truncate">Priya: WiFi Bill</div>
+                            </div>
                         </div>
-                        <div className="flex-1">
-                            <div className="text-[10px] font-bold">Priya added an expense</div>
-                            <div className="text-[8px] text-muted-foreground">WiFi Bill • ₹400</div>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 rounded-xl bg-muted/30 opacity-50">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                            <CheckCircle2 className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                            <div className="text-[10px] font-bold">Amit settled up</div>
-                            <div className="text-[8px] text-muted-foreground">Successfully cleared</div>
+                        <div className="flex items-center gap-4 p-3 rounded-2xl bg-white/5 opacity-50 transform -rotate-1 translate-y-2">
+                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                                <CheckCircle2 className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-[10px] font-bold">SETTLEMENT</div>
+                                <div className="text-xs font-medium">Amit settled bill</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,27 +188,29 @@ const slides = [
         step: "06",
         description: "Stay within limits. Track your monthly spending goals and avoid end-of-month surprises.",
         icon: Wallet,
-        color: "from-cyan-500/20 to-blue-500/20",
+        color: "from-cyan-500 to-blue-600",
+        lightColor: "bg-cyan-500/10",
         iconColor: "text-cyan-500",
         visual: (
-            <div className="relative w-full h-full flex items-center justify-center p-6">
-                <div className="glass p-5 rounded-2xl border-2 border-cyan-500/20 shadow-xl w-full max-w-[240px] animate-float" style={{ animationDelay: "1000ms" }}>
-                    <div className="text-sm font-bold mb-4 flex items-center justify-between">
-                        <span>Monthly Budget</span>
-                        <span className="text-[10px] text-cyan-500">75% Used</span>
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="glass p-6 rounded-[2.5rem] border-2 border-cyan-500/20 shadow-2xl w-full max-w-[250px] animate-float bg-white/10 backdrop-blur-md">
+                    <div className="text-sm font-black mb-6 flex items-center justify-between uppercase tracking-widest text-cyan-600">
+                        <span>Budget</span>
+                        <span className="text-[10px] bg-cyan-500/20 px-2 py-0.5 rounded-full">75%</span>
                     </div>
-                    <div className="space-y-4">
-                        <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-cyan-500 w-[75%] rounded-full shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
+                    <div className="space-y-6">
+                        <div className="relative h-4 w-full bg-cyan-500/10 rounded-full overflow-hidden border border-cyan-500/10">
+                            <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-400 to-cyan-600 w-[75%] rounded-full shadow-[0_0_20px_rgba(6,182,212,0.6)]" />
+                            <div className="absolute inset-0 bg-white/30 skew-x-[-20deg] animate-shine" />
                         </div>
-                        <div className="flex justify-between items-end">
+                        <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
                             <div>
-                                <div className="text-[10px] text-muted-foreground">Spent</div>
-                                <div className="text-sm font-bold">₹3,750</div>
+                                <div className="text-[9px] font-black opacity-40 uppercase">Spent</div>
+                                <div className="text-lg font-black text-cyan-500">₹3,750</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-[10px] text-muted-foreground">Total</div>
-                                <div className="text-sm font-bold opacity-60">₹5,000</div>
+                                <div className="text-[9px] font-black opacity-40 uppercase">Goal</div>
+                                <div className="text-lg font-black opacity-20">₹5,000</div>
                             </div>
                         </div>
                     </div>
@@ -206,97 +221,216 @@ const slides = [
 ];
 
 export const HowItWorksCarousel = () => {
-    const [api, setApi] = React.useState<any>();
+    const [api, setApi] = useState<CarouselApi>();
+    const [isVisible, setIsVisible] = useState(false);
+    const TWEEN_FACTOR = 0.8;
 
-    React.useEffect(() => {
+    const onScroll = useCallback((api: CarouselApi) => {
         if (!api) return;
+        const engine = api.internalEngine();
+        const scrollProgress = api.scrollProgress();
+        const slidesInView = api.slidesInView();
 
-        const autoplay = () => {
-            api.scrollNext();
-        };
+        api.scrollSnapList().forEach((scrollSnap, index) => {
+            let diffToTarget = scrollSnap - scrollProgress;
+            const slides = api.slideNodes();
 
-        const intervalId = setInterval(autoplay, 4000);
+            if (engine.options.loop) {
+                engine.slideLooper.loopPoints.forEach((loopPoint) => {
+                    const target = loopPoint.target();
+                    if (index === loopPoint.index && target !== 0) {
+                        const sign = Math.sign(target);
+                        if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress);
+                        if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress);
+                    }
+                });
+            }
 
-        // Stop autoplay on interaction
-        api.on("pointerDown", () => {
-            clearInterval(intervalId);
+            const tweenValue = 1 - Math.abs(diffToTarget * TWEEN_FACTOR);
+            const scale = Math.max(0.85, Math.min(1.1, tweenValue * 1.05));
+            const opacity = Math.max(0.4, Math.min(1, tweenValue * 1.2));
+            const rotate = diffToTarget * 15;
+            const translateY = Math.abs(diffToTarget * 40);
+
+            const slide = slides[index];
+            slide.style.setProperty("--slide-scale", `${scale}`);
+            slide.style.setProperty("--slide-opacity", `${opacity}`);
+            slide.style.setProperty("--slide-rotate", `${rotate}deg`);
+            slide.style.setProperty("--slide-translate-y", `${translateY}px`);
         });
+    }, []);
 
-        return () => clearInterval(intervalId);
-    }, [api]);
+    useEffect(() => {
+        if (!api) return;
+        api.on("scroll", () => onScroll(api));
+        api.on("reInit", () => onScroll(api));
+        onScroll(api);
+
+        // Initial POP animation
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                setIsVisible(true);
+                observer.disconnect();
+            }
+        }, { threshold: 0.2 });
+
+        const element = document.getElementById("how-it-works-3d");
+        if (element) observer.observe(element);
+
+        // Autoplay
+        const timer = setInterval(() => {
+            api.scrollNext();
+        }, 4500);
+
+        return () => {
+            clearInterval(timer);
+            observer.disconnect();
+        };
+    }, [api, onScroll]);
 
     return (
-        <div className="w-full max-w-6xl mx-auto px-4 py-12">
-            <Carousel
-                setApi={setApi}
-                opts={{
-                    align: "start",
-                    loop: true,
-                    dragFree: false, // Ensure it snaps to slides
-                }}
-                className="w-full relative group"
-            >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                    {slides.map((slide, index) => (
-                        <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                            <Card className="h-full border-none bg-gradient-to-br from-card to-muted/20 relative overflow-hidden group/card hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
-                                {/* Background Accent */}
-                                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${slide.color} blur-3xl opacity-50 group-hover/card:opacity-100 transition-opacity`} />
+        <div className="w-full relative py-20 overflow-hidden" id="how-it-works-3d">
+            <div className="container relative z-10 px-4 mb-12">
+                <h2 className="text-4xl md:text-6xl font-black text-center mb-6 tracking-tighter">
+                    Seamless <span className="text-primary italic">Experience.</span>
+                </h2>
+                <p className="text-center text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
+                    Swipe through the 6 simple steps to master your hostel expenses.
+                </p>
+            </div>
 
-                                <CardContent className="p-6 md:p-8 flex flex-col h-full relative z-10">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className={`p-3 rounded-2xl bg-background border border-border/50 shadow-sm ${slide.iconColor}`}>
-                                            <slide.icon className="w-6 h-6" />
-                                        </div>
-                                        <span className="text-4xl font-black opacity-5 pointer-events-none select-none">
-                                            {slide.step}
-                                        </span>
-                                    </div>
+            <div className={cn(
+                "transition-all duration-1000 ease-out perspective-2000",
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20 scale-95"
+            )}>
+                <Carousel
+                    setApi={setApi}
+                    opts={{
+                        align: "center",
+                        loop: true,
+                        dragFree: false,
+                    }}
+                    className="w-full max-w-[1400px] mx-auto"
+                >
+                    <CarouselContent className="-ml-0 py-20 px-[20vw] md:px-[30vw]">
+                        {slides.map((slide, index) => (
+                            <CarouselItem
+                                key={index}
+                                className="pl-0 basis-full sm:basis-1/2 lg:basis-1/3 flex justify-center items-center"
+                                style={{
+                                    transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
+                                    transform: `
+                    scale(var(--slide-scale, 0.9)) 
+                    rotateY(var(--slide-rotate, 0deg)) 
+                    translateY(var(--slide-translate-y, 0px))
+                  `,
+                                    opacity: "var(--slide-opacity, 0.5)",
+                                }}
+                            >
+                                <div className="w-[300px] sm:w-[350px] aspect-[4/5] relative group">
+                                    {/* Shadow Layer */}
+                                    <div className={cn(
+                                        "absolute -inset-4 rounded-[3rem] blur-3xl opacity-20 transition-all duration-500 group-hover:opacity-40",
+                                        slide.color.split(' ')[0].replace('from-', 'bg-')
+                                    )} />
 
-                                    <div className="flex-1">
-                                        <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover/card:text-primary transition-colors">
-                                            {slide.title}
-                                        </h3>
-                                        <p className="text-muted-foreground text-sm md:text-base leading-relaxed mb-6">
-                                            {slide.description}
-                                        </p>
-                                    </div>
+                                    <Card className="h-full w-full rounded-[2.5rem] border-none bg-gradient-to-br from-card to-muted/40 overflow-hidden shadow-2xl relative">
+                                        {/* Top Gradient Bar */}
+                                        <div className={cn("h-2 w-full bg-gradient-to-r", slide.color)} />
 
-                                    {/* Interactive Visual Area */}
-                                    <div className="bg-muted/30 rounded-3xl aspect-[4/3] relative overflow-hidden group-hover/card:bg-muted/50 transition-colors">
-                                        {slide.visual}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex -left-4 lg:-left-12 h-12 w-12 border-2 bg-background/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all shadow-xl" />
-                <CarouselNext className="hidden md:flex -right-4 lg:-right-12 h-12 w-12 border-2 bg-background/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all shadow-xl" />
+                                        <CardContent className="p-0 flex flex-col h-full">
+                                            {/* Visual Header */}
+                                            <div className={cn("h-[60%] w-full relative overflow-hidden flex items-center justify-center p-8", slide.lightColor)}>
+                                                <div className="absolute inset-0 bg-grid-white/[0.05] [mask-image:radial-gradient(white,transparent_85%)]" />
+                                                {slide.visual}
+                                            </div>
 
-                {/* Mobile Swipe Indicator */}
-                <div className="flex md:hidden justify-center items-center gap-2 mt-8 text-xs font-medium text-muted-foreground animate-pulse">
-                    <ArrowRight className="w-3 h-3 rotate-180" />
-                    <span>Swipe to explore</span>
-                    <ArrowRight className="w-3 h-3" />
-                </div>
-            </Carousel>
+                                            {/* Content Footer */}
+                                            <div className="flex-1 p-8 flex flex-col justify-between bg-card/80 backdrop-blur-sm border-t border-border/50">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <Badge variant="outline" className="font-black border-2 px-3 py-1 text-xs uppercase tracking-tighter shadow-sm">
+                                                            Step {slide.step}
+                                                        </Badge>
+                                                        <div className={cn("p-2 rounded-xl bg-background border border-border/50 shadow-inner rotate-3", slide.iconColor)}>
+                                                            <slide.icon className="w-5 h-5" />
+                                                        </div>
+                                                    </div>
+                                                    <h3 className="text-2xl font-black mb-2 tracking-tight group-hover:text-primary transition-colors">
+                                                        {slide.title}
+                                                    </h3>
+                                                    <p className="text-muted-foreground text-sm font-medium leading-tight">
+                                                        {slide.description}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2 group-hover:translate-x-1 transition-transform cursor-pointer mt-4">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Explore details</span>
+                                                    <ArrowRight className="w-3 h-3 text-primary" />
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+
+                    {/* Nav Buttons */}
+                    <div className="hidden md:flex justify-center items-center gap-10 mt-[-20px] pb-10 relative z-20">
+                        <button
+                            onClick={() => api?.scrollPrev()}
+                            className="w-14 h-14 rounded-full bg-background border-2 border-border/50 flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all shadow-xl backdrop-blur-md active:scale-95"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                            onClick={() => api?.scrollNext()}
+                            className="w-14 h-14 rounded-full bg-background border-2 border-border/50 flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all shadow-xl backdrop-blur-md active:scale-95"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                    </div>
+
+                    {/* Swipe text for mobile */}
+                    <div className="flex md:hidden justify-center items-center gap-2 mt-[-10px] pb-10 opacity-50 font-black text-[10px] uppercase tracking-widest animate-pulse">
+                        <ArrowRight className="w-3 h-3 rotate-180" />
+                        <span>Swipe for Next Step</span>
+                        <ArrowRight className="w-3 h-3" />
+                    </div>
+                </Carousel>
+            </div>
 
             <style>{`
+        .perspective-2000 {
+            perspective: 2000px;
+        }
         @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(1deg); }
+          0%, 100% { transform: translateY(0px) rotate(1deg); }
+          50% { transform: translateY(-15px) rotate(-1deg); }
+        }
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(-5px) rotate(-1deg); }
+          50% { transform: translateY(10px) rotate(1deg); }
         }
         .animate-float {
-          animation: float 4s ease-in-out infinite;
+          animation: float 5s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 6s ease-in-out infinite;
         }
         .glass {
-          background: rgba(var(--background), 0.8);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          background: rgba(255, 255, 255, 0.05);
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
         .dark .glass {
-          background: rgba(var(--card), 0.6);
+          background: rgba(0, 0, 0, 0.2);
+        }
+        @keyframes shine {
+          0% { transform: translateX(-100%) skewX(-20deg); }
+          100% { transform: translateX(200%) skewX(-20deg); }
+        }
+        .animate-shine {
+          animation: shine 3s infinite linear;
         }
       `}</style>
         </div>
