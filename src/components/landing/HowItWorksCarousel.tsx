@@ -310,24 +310,28 @@ export const HowItWorksCarousel = () => {
                         loop: true,
                         dragFree: false,
                     }}
-                    className="w-full max-w-[1400px] mx-auto"
+                    className="w-full relative group px-4 md:px-16"
                 >
-                    <CarouselContent className="-ml-0 py-20 px-[20vw] md:px-[30vw]">
+                    <CarouselContent className="-ml-4 py-20">
                         {slides.map((slide, index) => (
                             <CarouselItem
                                 key={index}
-                                className="pl-0 basis-full sm:basis-1/2 lg:basis-1/3 flex justify-center items-center"
+                                className="pl-4 basis-full md:basis-[45%] lg:basis-[35%] flex justify-center items-center"
                                 style={{
-                                    transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
-                                    transform: `
-                    scale(var(--slide-scale, 0.9)) 
-                    rotateY(var(--slide-rotate, 0deg)) 
-                    translateY(var(--slide-translate-y, 0px))
-                  `,
-                                    opacity: "var(--slide-opacity, 0.5)",
+                                    perspective: "1000px",
                                 }}
                             >
-                                <div className="w-[300px] sm:w-[350px] aspect-[4/5] relative group">
+                                <div
+                                    className="w-full max-w-[350px] aspect-[4/5] relative group transition-all duration-300 ease-out"
+                                    style={{
+                                        transform: `
+                      scale(var(--slide-scale, 0.9))
+                      rotateY(var(--slide-rotate, 0deg))
+                      translateY(var(--slide-translate-y, 0px))
+                    `,
+                                        opacity: "var(--slide-opacity, 0.5)",
+                                    }}
+                                >
                                     {/* Shadow Layer */}
                                     <div className={cn(
                                         "absolute -inset-4 rounded-[3rem] blur-3xl opacity-20 transition-all duration-500 group-hover:opacity-40",
@@ -356,14 +360,14 @@ export const HowItWorksCarousel = () => {
                                                             <slide.icon className="w-5 h-5" />
                                                         </div>
                                                     </div>
-                                                    <h3 className="text-2xl font-black mb-2 tracking-tight group-hover:text-primary transition-colors">
+                                                    <h3 className="text-2xl font-black mb-2 tracking-tight">
                                                         {slide.title}
                                                     </h3>
                                                     <p className="text-muted-foreground text-sm font-medium leading-tight">
                                                         {slide.description}
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 group-hover:translate-x-1 transition-transform cursor-pointer mt-4">
+                                                <div className="flex items-center gap-2 mt-4 opacity-40">
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-primary">Explore details</span>
                                                     <ArrowRight className="w-3 h-3 text-primary" />
                                                 </div>
@@ -375,21 +379,9 @@ export const HowItWorksCarousel = () => {
                         ))}
                     </CarouselContent>
 
-                    {/* Nav Buttons */}
-                    <div className="hidden md:flex justify-center items-center gap-10 mt-[-20px] pb-10 relative z-20">
-                        <button
-                            onClick={() => api?.scrollPrev()}
-                            className="w-14 h-14 rounded-full bg-background border-2 border-border/50 flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all shadow-xl backdrop-blur-md active:scale-95"
-                        >
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={() => api?.scrollNext()}
-                            className="w-14 h-14 rounded-full bg-background border-2 border-border/50 flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all shadow-xl backdrop-blur-md active:scale-95"
-                        >
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
-                    </div>
+                    {/* Nav Buttons - MOVED TO SIDES */}
+                    <CarouselPrevious className="hidden md:flex -left-4 lg:-left-12 h-14 w-14 border-2 bg-background/80 hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-md" />
+                    <CarouselNext className="hidden md:flex -right-4 lg:-right-12 h-14 w-14 border-2 bg-background/80 hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-md" />
 
                     {/* Swipe text for mobile */}
                     <div className="flex md:hidden justify-center items-center gap-2 mt-[-10px] pb-10 opacity-50 font-black text-[10px] uppercase tracking-widest animate-pulse">
