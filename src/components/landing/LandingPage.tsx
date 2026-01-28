@@ -510,17 +510,40 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
               <span>No Ads</span>
             </div>
 
+            {/* SEPARATOR */}
+            <div className="hidden sm:block text-border text-2xl font-light">|</div>
+
+            {/* BRANDING RESTORED */}
+            <div className="flex items-center gap-2 font-medium animate-wave-shine" style={{ animationDelay: '0.9s' }}>
+              <span className="text-emerald-600/60 font-bold">A</span>
+              <img src="/broken-table-light.png" alt="Broken Table" className="h-16 md:h-20 w-auto dark:hidden opacity-80" />
+              <img src="/broken-table-dark.png" alt="Broken Table" className="h-16 md:h-20 w-auto hidden dark:block opacity-80" />
+              <span className="text-emerald-600/60 font-bold">Product.</span>
+            </div>
+
           </div>
 
           {/* Hero Carousel - How it Works */}
           <div className="mt-16 animate-fade-in" style={{ animationDelay: '1.2s' }}>
             <HowItWorksCarousel />
           </div>
+
+          {/* ADDED MISSING GREEN CTA BUTTON */}
+          <div className="mt-10 animate-fade-in" style={{ animationDelay: '1.5s' }}>
+            <Button
+              size="lg"
+              onClick={() => session ? setMode('create') : navigate("/auth")}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-6 rounded-2xl text-lg font-bold shadow-xl shadow-emerald-600/20 active:scale-95 transition-all"
+            >
+              Get Started Now — It's Free 🚀
+            </Button>
+            <p className="text-xs text-muted-foreground mt-4 font-medium uppercase tracking-[0.2em]">No credit card required • Instant access</p>
+          </div>
         </div>
 
 
         {/* Floating Preview Card - CENTERED CONTENT */}
-        <div className="max-w-6xl mx-auto mb-32" id="preview-card-section">
+        <div className="max-w-6xl mx-auto mb-24 md:mb-28" id="preview-card-section">
           <Card variant="elevated" className="p-8 md:p-12 bg-gradient-to-br from-card via-card to-primary/5 border-2 shadow-2xl backdrop-blur-sm bg-white/50 dark:bg-card/50">
             <div className="grid md:grid-cols-3 gap-10">
 
@@ -670,7 +693,7 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
         </div>
 
         {/* Use Cases */}
-        <div className="mb-32" id="use-cases-section">
+        <div className="mb-24 md:mb-28" id="use-cases-section">
           <h2 className={`text-3xl md:text-4xl font-bold text-center mb-4 transition-all duration-500 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>Perfect for hostel life 🏠</h2>
           <p className={`text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto transition-all duration-500 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`} style={{ transitionDelay: useCasesVisible ? '100ms' : '0ms' }}>
             Track everything from daily snacks to monthly bills
@@ -690,7 +713,7 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
         </div>
 
         {/* Testimonials */}
-        <div className="mb-32" id="testimonials-section">
+        <div className="mb-24 md:mb-28" id="testimonials-section">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Loved by students 💜</h2>
           <p className="text-xl text-muted-foreground text-center mb-16">
             Join thousands of happy hostelites
@@ -773,7 +796,6 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             <HostelDialog
-              open={true}
               onHostelJoined={onHostelJoined}
               onClose={() => setMode('landing')}
               initialMode={mode as 'create' | 'join'}

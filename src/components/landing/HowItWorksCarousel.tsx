@@ -310,7 +310,7 @@ export const HowItWorksCarousel = () => {
                         loop: true,
                         dragFree: false,
                     }}
-                    className="w-full relative group px-4 md:px-16"
+                    className="w-full relative group"
                 >
                     <CarouselContent className="-ml-4 py-20">
                         {slides.map((slide, index) => (
@@ -379,9 +379,9 @@ export const HowItWorksCarousel = () => {
                         ))}
                     </CarouselContent>
 
-                    {/* Nav Buttons - MOVED TO SIDES */}
-                    <CarouselPrevious className="hidden md:flex -left-4 lg:-left-12 h-14 w-14 border-2 bg-background/80 hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-md" />
-                    <CarouselNext className="hidden md:flex -right-4 lg:-right-12 h-14 w-14 border-2 bg-background/80 hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-md" />
+                    {/* Nav Buttons - FLOATING OVER SIDES */}
+                    <CarouselPrevious className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-30 h-10 w-10 md:h-14 md:w-14 border-2 bg-background/40 hover:bg-primary/80 hover:text-white transition-all shadow-xl backdrop-blur-md opacity-40 hover:opacity-100" />
+                    <CarouselNext className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-30 h-10 w-10 md:h-14 md:w-14 border-2 bg-background/40 hover:bg-primary/80 hover:text-white transition-all shadow-xl backdrop-blur-md opacity-40 hover:opacity-100" />
 
                     {/* Swipe text for mobile */}
                     <div className="flex md:hidden justify-center items-center gap-2 mt-[-10px] pb-10 opacity-50 font-black text-[10px] uppercase tracking-widest animate-pulse">
