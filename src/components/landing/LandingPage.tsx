@@ -510,17 +510,6 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
               <span>No Ads</span>
             </div>
 
-            {/* SEPARATOR */}
-            <div className="hidden sm:block text-border text-2xl font-light">|</div>
-
-            {/* BRANDING RESTORED */}
-            <div className="flex items-center gap-2 font-medium animate-wave-shine" style={{ animationDelay: '0.9s' }}>
-              <span className="text-emerald-600/60 font-bold">A</span>
-              <img src="/broken-table-light.png" alt="Broken Table" className="h-16 md:h-20 w-auto dark:hidden opacity-80" />
-              <img src="/broken-table-dark.png" alt="Broken Table" className="h-16 md:h-20 w-auto hidden dark:block opacity-80" />
-              <span className="text-emerald-600/60 font-bold">Product.</span>
-            </div>
-
           </div>
 
           {/* Hero Carousel - How it Works */}
