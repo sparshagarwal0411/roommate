@@ -421,14 +421,16 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
                   variant="hero"
                   className="w-full flex items-center justify-center gap-2"
                   onClick={() => handleMarkAsPaid(selectedSettlement)}
-                  disabled={addSettlement.isPending}
+                  disabled={addSettlement.isPending || (currentMemberId !== selectedSettlement.from && currentMemberId !== selectedSettlement.to)}
                 >
                   {addSettlement.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <CheckCircle className="h-4 w-4" />
                   )}
-                  Mark as Fully Paid
+                  {(currentMemberId === selectedSettlement.from || currentMemberId === selectedSettlement.to)
+                    ? "Mark as Fully Paid"
+                    : "Only participants can settle"}
                 </Button>
 
                 {(currentMemberId === selectedSettlement.to || isOwner) && (

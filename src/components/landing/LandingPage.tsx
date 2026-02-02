@@ -424,7 +424,7 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
               alt="RoomMate Logo"
               className="md:w-30 md:h-40 object-contain"
             />
-            <span className="font-extrabold text-6xl md:text-7xl lg:text-8xl tracking-tight leading-none">
+            <span className="font-extrabold text-4xl sm:text-5xl md:text-7xl lg:text-8xl tracking-tight leading-none">
               <TypewriterTitle text="Room Mate" />
             </span>
           </div>
@@ -436,7 +436,7 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           </div>
 
           {/* PUNCHLINE WITH STATIC GRADIENT (TEAL -> BLUE -> PURPLE) */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight">
             Split expenses,{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 pb-2">
               not friendships
@@ -656,7 +656,7 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           <p className="text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
             Simple tools to manage shared living expenses without the headaches
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto overflow-hidden p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto overflow-hidden p-4">
             {features.map((feature, i) => (
               <Card
                 key={feature.title}

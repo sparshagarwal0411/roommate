@@ -291,7 +291,7 @@ export const HowItWorksCarousel = () => {
     return (
         <div className="w-full relative py-20 overflow-hidden" id="how-it-works-3d">
             <div className="container relative z-10 px-4 mb-12">
-                <h2 className="text-4xl md:text-6xl font-black text-center mb-6 tracking-tighter">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-center mb-6 tracking-tighter">
                     Seamless <span className="text-primary italic">Experience.</span>
                 </h2>
                 <p className="text-center text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
@@ -379,9 +379,9 @@ export const HowItWorksCarousel = () => {
                         ))}
                     </CarouselContent>
 
-                    {/* Nav Buttons - FLOATING OVER SIDES */}
-                    <CarouselPrevious className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-30 h-10 w-10 md:h-14 md:w-14 border-2 bg-background/40 hover:bg-primary/80 hover:text-white transition-all shadow-xl backdrop-blur-md opacity-40 hover:opacity-100" />
-                    <CarouselNext className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-30 h-10 w-10 md:h-14 md:w-14 border-2 bg-background/40 hover:bg-primary/80 hover:text-white transition-all shadow-xl backdrop-blur-md opacity-40 hover:opacity-100" />
+                    {/* Nav Buttons - FLOATING OVER SIDES - HIDDEN ON SMALL SCREENS */}
+                    <CarouselPrevious className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-30 h-10 w-10 md:h-14 md:w-14 border-2 bg-background/40 hover:bg-primary/80 hover:text-white transition-all shadow-xl backdrop-blur-md opacity-40 hover:opacity-100 hidden sm:flex" />
+                    <CarouselNext className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-30 h-10 w-10 md:h-14 md:w-14 border-2 bg-background/40 hover:bg-primary/80 hover:text-white transition-all shadow-xl backdrop-blur-md opacity-40 hover:opacity-100 hidden sm:flex" />
 
                     {/* Swipe text for mobile */}
                     <div className="flex md:hidden justify-center items-center gap-2 mt-[-10px] pb-10 opacity-50 font-black text-[10px] uppercase tracking-widest animate-pulse">
