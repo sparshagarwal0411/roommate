@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Mic, MicOff, Loader2, Sparkles, Volume2 } from "lucide-react";
+import { Mic, MicOff, Loader2, Sparkles, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Member, useAddExpense, useAddNotification } from "@/hooks/useHostel";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface EchoVoiceAssistantProps {
     members: Member[];
@@ -13,6 +13,7 @@ interface EchoVoiceAssistantProps {
 }
 
 export const EchoVoiceAssistant = ({ members, hostelId }: EchoVoiceAssistantProps) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [transcript, setTranscript] = useState("");
@@ -158,6 +159,7 @@ export const EchoVoiceAssistant = ({ members, hostelId }: EchoVoiceAssistantProp
                     icon: <Sparkles className="h-4 w-4 text-primary" />
                 });
                 setTranscript("");
+                setIsOpen(false);
             } else {
                 throw new Error("Missing details in AI response");
             }
@@ -170,69 +172,95 @@ export const EchoVoiceAssistant = ({ members, hostelId }: EchoVoiceAssistantProp
     };
 
     useEffect(() => {
-        if (!isListening && transcript && !isProcessing) {
+        if (!isListening && transcript && !isProcessing && isOpen) {
             handleProcessVoice();
         }
     }, [isListening]);
 
     return (
-        <Card className="relative overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-accent/5 h-full">
-            <div className="absolute top-0 right-0 p-2">
-                <Sparkles className="h-4 w-4 text-primary/40 animate-pulse" />
-            </div>
-
-            <CardHeader className="pb-2">
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
-                    <Volume2 className="h-5 w-5 text-primary" />
-                    Echo
-                </CardTitle>
-                <CardDescription className="text-xs">
-                    Speak to register expenses instantly
-                </CardDescription>
-            </CardHeader>
-
-            <CardContent className="flex flex-col items-center justify-center space-y-4 pt-4 pb-6">
-                <div className="relative">
-                    {isListening && (
-                        <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                    )}
-                    <Button
-                        size="icon"
-                        variant={isListening ? "destructive" : "hero"}
-                        className={cn(
-                            "h-20 w-20 rounded-full shadow-lg transition-all duration-300",
-                            isListening ? "scale-110" : "hover:scale-105"
-                        )}
-                        onClick={isListening ? stopListening : startListening}
-                        disabled={isProcessing}
+        <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-4 pointer-events-none">
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                        className="w-72 bg-background/95 backdrop-blur-md border-2 border-primary/20 rounded-2xl shadow-2xl p-4 pointer-events-auto overflow-hidden relative"
                     >
-                        {isListening ? (
-                            <MicOff className="h-8 w-8" />
-                        ) : isProcessing ? (
-                            <Loader2 className="h-8 w-8 animate-spin" />
-                        ) : (
-                            <Mic className="h-8 w-8" />
-                        )}
-                    </Button>
-                </div>
-
-                <div className="text-center min-h-[40px] px-2 w-full">
-                    {isListening ? (
-                        <p className="text-sm font-medium animate-pulse text-primary italic">
-                            Listening: "{transcript || "..."}"
-                        </p>
-                    ) : isProcessing ? (
-                        <div className="flex items-center justify-center gap-2">
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            <p className="text-xs text-muted-foreground">Echoing to Gemini...</p>
+                        <div className="absolute top-0 right-0 p-1">
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsOpen(false)}>
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
-                    ) : (
-                        <p className="text-[10px] text-muted-foreground italic">
-                            "Paid 500 for pizza" or "Spent 200 on petrol"
-                        </p>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
+
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="p-1.5 rounded-lg bg-primary/10">
+                                <Volume2 className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold">Echo Assistant</h3>
+                                <p className="text-[10px] text-muted-foreground">Voice Powered Expense</p>
+                            </div>
+                            <Sparkles className="h-3 w-3 text-primary/40 ml-auto animate-pulse" />
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center py-4 space-y-4">
+                            <div className="relative">
+                                {isListening && (
+                                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                                )}
+                                <Button
+                                    size="icon"
+                                    variant={isListening ? "destructive" : "hero"}
+                                    className={cn(
+                                        "h-16 w-16 rounded-full shadow-lg transition-all duration-300",
+                                        isListening ? "scale-110" : "hover:scale-105"
+                                    )}
+                                    onClick={isListening ? stopListening : startListening}
+                                    disabled={isProcessing}
+                                >
+                                    {isListening ? (
+                                        <MicOff className="h-6 w-6" />
+                                    ) : isProcessing ? (
+                                        <Loader2 className="h-6 w-6 animate-spin" />
+                                    ) : (
+                                        <Mic className="h-6 w-6" />
+                                    )}
+                                </Button>
+                            </div>
+
+                            <div className="text-center min-h-[40px] w-full">
+                                {isListening ? (
+                                    <p className="text-xs font-medium animate-pulse text-primary italic">
+                                        "{transcript || "Listening..."}"
+                                    </p>
+                                ) : isProcessing ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                        <p className="text-[10px] text-muted-foreground">Echoing to Gemini...</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-[10px] text-muted-foreground italic px-2">
+                                        "Spent 500 on dinner" or "Paid 200 for petrol"
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <Button
+                size="icon"
+                variant="hero"
+                className={cn(
+                    "h-14 w-14 rounded-full shadow-xl pointer-events-auto transition-transform active:scale-95",
+                    isOpen && "rotate-90 scale-0"
+                )}
+                onClick={() => setIsOpen(true)}
+            >
+                <Mic className="h-6 w-6" />
+            </Button>
+        </div>
     );
 };

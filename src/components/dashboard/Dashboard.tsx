@@ -453,10 +453,9 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
               </section>
             )}
 
-            {/* Top Row: Budget, Echo & Add Expense */}
-            <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-4 ${selectedMonth ? "opacity-50 pointer-events-none" : ""}`}>
+            {/* Top Row: Budget & Add Expense */}
+            <div className={`grid md:grid-cols-2 gap-4 ${selectedMonth ? "opacity-50 pointer-events-none" : ""}`}>
               <BudgetTracker hostel={hostel!} totalSpent={totalSpent} totalIncome={totalIncome} expenses={filteredExpenses} />
-              <EchoVoiceAssistant members={members} hostelId={hostelId} />
               <div className="flex flex-col gap-4 p-6 bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl border border-dashed border-primary/20 justify-center h-full">
                 <ExpenseForm members={members} hostelId={hostelId} />
                 <IncomeForm hostelId={hostelId} />
@@ -541,6 +540,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
         totalSpent={totalSpent}
       />
       <ScrollToTop />
+      <EchoVoiceAssistant members={members} hostelId={hostelId} />
       <Footer />
     </div>
   );
