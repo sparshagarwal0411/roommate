@@ -23,6 +23,7 @@ import { MonthlyHistory } from "./MonthlyHistory";
 import { NotificationBell } from "./NotificationBell";
 import { NotificationPopup } from "./NotificationPopup";
 import { BroadcastDialog } from "./BroadcastDialog";
+import { MonthlySummary, MonthlySummaryButton } from "./MonthlySummary";
 import { AISpendingAdvisor } from "./AISpendingAdvisor";
 import { EchoVoiceAssistant } from "./EchoVoiceAssistant";
 import { ComplaintsDashboard } from "./ComplaintsDashboard";
@@ -431,6 +432,13 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
               setViewMode("current");
             }}
           />
+        ) : viewMode === "complaints" ? (
+          <ComplaintsDashboard
+            hostelId={hostelId}
+            members={members}
+            isOwner={isOwner}
+            currentMemberId={me?.id}
+          />
         ) : (
           <>
             {/* Welcome Message */}
@@ -531,14 +539,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
 
 
           </>
-        ) : viewMode === "complaints" ? (
-        <ComplaintsDashboard
-          hostelId={hostelId}
-          members={members}
-          isOwner={isOwner}
-          currentMemberId={me?.id}
-        />
-        ) : null}
+        )}
       </main>
       <ScrollToTop />
       <EchoVoiceAssistant members={members} hostelId={hostelId} />

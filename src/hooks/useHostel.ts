@@ -20,6 +20,8 @@ export interface Member {
   room_no: string | null;
   created_at: string;
   profile_id?: string;
+  upi_id?: string | null;
+  upi_qr_url?: string | null;
 }
 
 export interface Expense {
@@ -148,7 +150,7 @@ export const useHostelByCode = (code: string) => {
   });
 };
 
-// Fetch members of a hostel
+// Fetch all members of a hostel with their profile UPI info
 export const useMembers = (hostelId: string | null) => {
   return useQuery({
     queryKey: ['members', hostelId],
@@ -156,11 +158,24 @@ export const useMembers = (hostelId: string | null) => {
       if (!hostelId) return [];
       const { data, error } = await supabase
         .from('members')
-        .select('*')
+        .select(`
+          *,
+          profiles:profile_id (
+            upi_id,
+            upi_qr_url
+          )
+        `)
         .eq('hostel_id', hostelId)
         .order('created_at', { ascending: true });
+
       if (error) throw error;
-      return data as Member[];
+
+      // Flatten the profile data into the member object
+      return (data || []).map((member: any) => ({
+        ...member,
+        upi_id: member.profiles?.upi_id,
+        upi_qr_url: member.profiles?.upi_qr_url,
+      })) as Member[];
     },
     enabled: !!hostelId,
     staleTime: 1000 * 60 * 5,
@@ -914,12 +929,12 @@ export const useComplaints = (hostelId: string | null) => {
     queryFn: async () => {
       if (!hostelId) return [];
       const { data, error } = await supabase
-        .from('complaints')
+        .from('complaints' as any)
         .select('*')
         .eq('hostel_id', hostelId)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as Complaint[];
+      return (data as any) as Complaint[];
     },
     enabled: !!hostelId,
   });
@@ -931,12 +946,12 @@ export const useAddComplaint = () => {
   return useMutation({
     mutationFn: async (complaint: Omit<Complaint, 'id' | 'created_at' | 'updated_at' | 'status'>) => {
       const { data, error } = await supabase
-        .from('complaints')
+        .from('complaints' as any)
         .insert(complaint)
         .select()
         .single();
       if (error) throw error;
-      return data as Complaint;
+      return (data as any) as Complaint;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['complaints', variables.hostel_id] });
@@ -950,13 +965,13 @@ export const useUpdateComplaintStatus = () => {
   return useMutation({
     mutationFn: async ({ complaintId, status, hostelId }: { complaintId: string; status: Complaint['status']; hostelId: string }) => {
       const { data, error } = await supabase
-        .from('complaints')
+        .from('complaints' as any)
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', complaintId)
         .select()
         .single();
       if (error) throw error;
-      return data as Complaint;
+      return (data as any) as Complaint;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['complaints', variables.hostelId] });
@@ -971,12 +986,12 @@ export const useLostAndFound = (hostelId: string | null) => {
     queryFn: async () => {
       if (!hostelId) return [];
       const { data, error } = await supabase
-        .from('lost_found')
+        .from('lost_found' as any)
         .select('*')
         .eq('hostel_id', hostelId)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as LostAndFound[];
+      return (data as any) as LostAndFound[];
     },
     enabled: !!hostelId,
   });
@@ -988,12 +1003,12 @@ export const useAddLostAndFound = () => {
   return useMutation({
     mutationFn: async (item: Omit<LostAndFound, 'id' | 'created_at' | 'updated_at' | 'status'>) => {
       const { data, error } = await supabase
-        .from('lost_found')
+        .from('lost_found' as any)
         .insert(item)
         .select()
         .single();
       if (error) throw error;
-      return data as LostAndFound;
+      return (data as any) as LostAndFound;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lost_found', variables.hostel_id] });
@@ -1007,13 +1022,13 @@ export const useUpdateLostAndFoundStatus = () => {
   return useMutation({
     mutationFn: async ({ itemId, status, hostelId }: { itemId: string; status: LostAndFound['status']; hostelId: string }) => {
       const { data, error } = await supabase
-        .from('lost_found')
+        .from('lost_found' as any)
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', itemId)
         .select()
         .single();
       if (error) throw error;
-      return data as LostAndFound;
+      return (data as any) as LostAndFound;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lost_found', variables.hostelId] });

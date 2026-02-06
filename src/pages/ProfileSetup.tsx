@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { 
-    User, Users, MapPin, Phone, Calendar, 
-    Circle, Square, Triangle, Hexagon, X 
+import {
+    User, Users, MapPin, Phone, Calendar,
+    Circle, Square, Triangle, Hexagon, X,
+    CreditCard, Camera, Loader2
 } from "lucide-react";
 
 const ProfileSetup = () => {
@@ -21,43 +22,43 @@ const ProfileSetup = () => {
     // --- GRID SHAPE GENERATOR ---
     const shapes = useMemo(() => {
         const items = [];
-        const columns = 12; 
-        const rows = 12;    
-        
+        const columns = 12;
+        const rows = 12;
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < columns; col++) {
                 // Density control (Adjust > 0.5 to make it more/less crowded)
                 if (1 > 0) {
-                    
+
                     // --- DEPTH LOGIC ---
                     // Randomly assign a depth tier: 1 (Back), 2 (Mid), 3 (Front)
                     const depth = Math.random() < 0.6 ? 1 : Math.random() < 0.9 ? 2 : 3;
-                    
+
                     // Base scale multipliers based on depth
                     const sizeBase = depth === 1 ? 8 : depth === 2 ? 15 : 25;
                     const speedBase = depth === 1 ? 0.1 : depth === 2 ? 0.3 : 0.6;
 
                     items.push({
                         id: `${row}-${col}`,
-                        left: (col * (100 / columns)) + (Math.random() * (100 / columns)), 
+                        left: (col * (100 / columns)) + (Math.random() * (100 / columns)),
                         top: (row * (100 / rows)) + (Math.random() * (100 / rows)),
-                        
+
                         // Size varies by depth
-                        size: Math.random() * 5 + sizeBase, 
-                        
+                        size: Math.random() * 5 + sizeBase,
+
                         // Parallax speed varies by depth (Front moves faster)
                         parallaxSpeed: speedBase + Math.random() * 0.1,
-                        
+
                         // Z-Index ensures correct overlapping
-                        zIndex: depth, 
+                        zIndex: depth,
 
                         // Style properties
                         rotation: Math.random() * 360,
                         floatDuration: 10 + Math.random() * 10, // Slower float looks heavier
                         floatDelay: Math.random() * 5,
                         type: Math.floor(Math.random() * 5),
-                        floatX: (Math.random() - 0.5) * 60, 
-                        floatY: (Math.random() - 0.5) * 60  
+                        floatX: (Math.random() - 0.5) * 60,
+                        floatY: (Math.random() - 0.5) * 60
                     });
                 }
             }
@@ -79,7 +80,10 @@ const ProfileSetup = () => {
         gender: "",
         address: "",
         phone: "",
+        upi_id: "",
+        upi_qr_url: "",
     });
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -113,6 +117,8 @@ const ProfileSetup = () => {
                     gender: data.gender || "",
                     address: data.address || "",
                     phone: data.phone || "",
+                    upi_id: data.upi_id || "",
+                    upi_qr_url: data.upi_qr_url || "",
                 });
             }
             setLoading(false);
@@ -138,6 +144,8 @@ const ProfileSetup = () => {
                     gender: profile.gender,
                     phone: profile.phone,
                     address: profile.address,
+                    upi_id: profile.upi_id,
+                    upi_qr_url: profile.upi_qr_url,
                     updated_at: new Date().toISOString(),
                 });
 
@@ -151,11 +159,40 @@ const ProfileSetup = () => {
         }
     };
 
+    const handleQRUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("No user found");
+
+            const fileName = `${user.id}/qr-${Date.now()}-${file.name}`;
+            const { data, error } = await supabase.storage
+                .from('receipts')
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('receipts')
+                .getPublicUrl(fileName);
+
+            setProfile(prev => ({ ...prev, upi_qr_url: publicUrl }));
+            toast.success("QR Code uploaded! 📸");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to upload QR code");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     if (loading) return null;
 
     return (
         <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 bg-background transition-colors duration-300">
-            
+
             <style>{`
                 @keyframes float {
                     0% { transform: translate(0px, 0px) rotate(0deg); }
@@ -174,20 +211,20 @@ const ProfileSetup = () => {
                         top: `${shape.top}%`,
                         left: `${shape.left}%`,
                         zIndex: shape.zIndex, // Use the calculated layer (1, 2, or 3)
-                        
+
                         // Parallax logic uses the depth-based speed
                         transform: `translate(${mousePos.x * -50 * shape.parallaxSpeed}px, ${mousePos.y * -50 * shape.parallaxSpeed}px)`,
                         transition: 'transform 0.1s ease-out',
-                        
+
                         // CSS Variables for random float direction
                         // @ts-ignore
-                        "--tx": `${shape.floatX}px`, 
+                        "--tx": `${shape.floatX}px`,
                         "--ty": `${shape.floatY}px`
                     }}
                 >
-                    <div 
-                        style={{ 
-                            width: `${shape.size}px`, 
+                    <div
+                        style={{
+                            width: `${shape.size}px`,
                             height: `${shape.size}px`,
                             // Optional: Make back layers slightly transparent for atmospheric depth
                             opacity: shape.zIndex === 1 ? 0.3 : shape.zIndex === 2 ? 0.6 : 1,
@@ -195,7 +232,7 @@ const ProfileSetup = () => {
                             animationDelay: `${shape.floatDelay}s`
                         }}
                     >
-                         <ShapeIcon type={shape.type} className="w-full h-full" />
+                        <ShapeIcon type={shape.type} className="w-full h-full" />
                     </div>
                 </div>
             ))}
@@ -209,7 +246,7 @@ const ProfileSetup = () => {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleUpdate} className="grid md:grid-cols-2 gap-6">
-                        
+
                         {/* LEFT COLUMN */}
                         <div className="space-y-4">
                             <div className="space-y-2">
@@ -269,6 +306,20 @@ const ProfileSetup = () => {
                                     />
                                 </div>
                             </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="address">Address</Label>
+                                <div className="relative">
+                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="address"
+                                        className="pl-10 bg-background/50 focus:bg-background transition-all"
+                                        placeholder="Current address"
+                                        value={profile.address}
+                                        onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         {/* RIGHT COLUMN */}
@@ -305,17 +356,40 @@ const ProfileSetup = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="address">Address</Label>
+                                <Label htmlFor="upiId">UPI ID (Optional)</Label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        id="address"
+                                        id="upiId"
                                         className="pl-10 bg-background/50 focus:bg-background transition-all"
-                                        placeholder="Current address"
-                                        value={profile.address}
-                                        onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                                        required
+                                        placeholder="username@bank"
+                                        value={profile.upi_id}
+                                        onChange={(e) => setProfile({ ...profile, upi_id: e.target.value })}
                                     />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>UPI QR Code (Optional)</Label>
+                                <div className="flex items-center gap-4">
+                                    <label htmlFor="qr-upload" className="cursor-pointer flex-1">
+                                        <div className="flex items-center justify-center gap-2 border-2 border-dashed rounded-xl py-2 hover:bg-muted/50 transition-all text-xs text-muted-foreground uppercase font-semibold">
+                                            {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                                            {isUploading ? "Uploading..." : profile.upi_qr_url ? "Change QR" : "Upload QR"}
+                                        </div>
+                                        <input
+                                            id="qr-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleQRUpload}
+                                            disabled={isUploading}
+                                        />
+                                    </label>
+                                    {profile.upi_qr_url && (
+                                        <div className="h-10 w-10 rounded-lg border overflow-hidden bg-muted flex items-center justify-center">
+                                            <img src={profile.upi_qr_url} alt="QR" className="h-full w-full object-cover" />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

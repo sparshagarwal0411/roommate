@@ -192,7 +192,7 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
                                     className={`p-4 rounded-xl border bg-card hover:shadow-md transition-all animate-fade-in flex flex-col ${item.status === 'closed' ? 'opacity-60' : ''}`}
                                 >
                                     <div className="flex items-center justify-between mb-3">
-                                        <Badge variant={item.type === 'lost' ? 'destructive' : 'success'} className="uppercase text-[10px]">
+                                        <Badge variant={item.type === 'lost' ? 'destructive' : 'outline'} className={`uppercase text-[10px] ${item.type === 'found' ? 'border-success text-success' : ''}`}>
                                             {item.type}
                                         </Badge>
                                         {item.status === 'closed' && (
