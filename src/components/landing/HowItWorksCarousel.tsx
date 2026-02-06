@@ -289,12 +289,12 @@ export const HowItWorksCarousel = () => {
     }, [api, onScroll]);
 
     return (
-        <div className="w-full relative py-20 overflow-hidden" id="how-it-works-3d">
-            <div className="container relative z-10 px-4 mb-12">
-                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-center mb-6 tracking-tighter">
+        <div className="w-full max-w-[100vw] relative py-12 sm:py-20 overflow-hidden" id="how-it-works-3d">
+            <div className="container relative z-10 px-3 sm:px-4 mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black text-center mb-4 sm:mb-6 tracking-tighter">
                     Seamless <span className="text-primary italic">Experience.</span>
                 </h2>
-                <p className="text-center text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
+                <p className="text-center text-muted-foreground text-sm sm:text-lg max-w-2xl mx-auto font-medium px-2">
                     Swipe through the 6 simple steps to master your hostel expenses.
                 </p>
             </div>
@@ -312,17 +312,17 @@ export const HowItWorksCarousel = () => {
                     }}
                     className="w-full relative group"
                 >
-                    <CarouselContent className="-ml-4 py-20">
+                    <CarouselContent className="-ml-2 sm:-ml-4 py-10 sm:py-20">
                         {slides.map((slide, index) => (
                             <CarouselItem
                                 key={index}
-                                className="pl-4 basis-full md:basis-[45%] lg:basis-[35%] flex justify-center items-center"
+                                className="pl-2 sm:pl-4 basis-full md:basis-[45%] lg:basis-[35%] flex justify-center items-center"
                                 style={{
                                     perspective: "1000px",
                                 }}
                             >
                                 <div
-                                    className="w-full max-w-[350px] aspect-[4/5] relative group transition-all duration-300 ease-out"
+                                    className="w-full max-w-[min(350px,85vw)] aspect-[4/5] relative group transition-all duration-300 ease-out"
                                     style={{
                                         transform: `
                       scale(var(--slide-scale, 0.9))
@@ -350,17 +350,17 @@ export const HowItWorksCarousel = () => {
                                             </div>
 
                                             {/* Content Footer */}
-                                            <div className="flex-1 p-8 flex flex-col justify-between bg-card/80 backdrop-blur-sm border-t border-border/50">
+                                            <div className="flex-1 p-4 sm:p-6 md:p-8 flex flex-col justify-between bg-card/80 backdrop-blur-sm border-t border-border/50">
                                                 <div>
-                                                    <div className="flex items-center justify-between mb-4">
-                                                        <Badge variant="outline" className="font-black border-2 px-3 py-1 text-xs uppercase tracking-tighter shadow-sm">
+                                                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                                        <Badge variant="outline" className="font-black border-2 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs uppercase tracking-tighter shadow-sm">
                                                             Step {slide.step}
                                                         </Badge>
-                                                        <div className={cn("p-2 rounded-xl bg-background border border-border/50 shadow-inner rotate-3", slide.iconColor)}>
-                                                            <slide.icon className="w-5 h-5" />
+                                                        <div className={cn("p-1.5 sm:p-2 rounded-xl bg-background border border-border/50 shadow-inner rotate-3", slide.iconColor)}>
+                                                            <slide.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                                                         </div>
                                                     </div>
-                                                    <h3 className="text-2xl font-black mb-2 tracking-tight">
+                                                    <h3 className="text-lg sm:text-xl md:text-2xl font-black mb-1 sm:mb-2 tracking-tight">
                                                         {slide.title}
                                                     </h3>
                                                     <p className="text-muted-foreground text-sm font-medium leading-tight">

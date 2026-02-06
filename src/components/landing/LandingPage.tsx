@@ -376,33 +376,38 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
       <GrainOverlay />
 
       <header className="fixed top-0 left-0 right-0 z-50 glass border-b">
-        <div className="container flex items-center justify-between h-16">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setMode('landing')}>
+        <div className="container flex items-center justify-between h-14 sm:h-16 gap-2 px-4 sm:px-6 min-w-0 max-w-full">
+          <button
+            type="button"
+            className="flex items-center gap-2 min-w-0 shrink cursor-pointer touch-manipulation"
+            onClick={() => setMode('landing')}
+            aria-label="RoomMate home"
+          >
             <img
               src="/ChatGPT Image Jan 15, 2026, 09_03_32 PM.png"
-              alt="RoomMate Logo"
-              className="w-12 h-12 object-contain"
+              alt=""
+              className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0"
             />
-            <span className="font-bold text-xl">RoomMate</span>
-          </div>
-          <div className="flex items-center gap-4">
+            <span className="font-bold text-lg sm:text-xl truncate">RoomMate</span>
+          </button>
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
             <ThemeToggle />
             {session ? (
-              <div className="flex items-center gap-3">
-                <Button onClick={() => navigate("/lobby")} variant="outline" className="hidden sm:flex">Lobby</Button>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Button onClick={() => navigate("/lobby")} variant="outline" size="sm" className="hidden sm:inline-flex">Lobby</Button>
                 <UserMenu />
               </div>
             ) : (
               <>
-                <Button onClick={() => navigate("/auth")} variant="ghost">Login</Button>
-                <Button onClick={() => navigate("/auth")}>Get Started</Button>
+                <Button onClick={() => navigate("/auth")} variant="ghost" size="sm" className="text-sm px-3 sm:px-4">Login</Button>
+                <Button onClick={() => navigate("/auth")} size="sm" className="text-sm px-3 sm:px-4">Get Started</Button>
               </>
             )}
           </div>
         </div>
       </header>
 
-      <main className="container pt-20 md:pt-24 pb-12 relative z-10">
+      <main className="container pt-16 sm:pt-20 md:pt-24 pb-12 px-4 sm:px-6 relative z-10 max-w-full overflow-x-hidden">
 
         {/* WAVE ANIMATION STYLE (FOR TRUST INDICATORS ONLY) */}
         <style>{`
@@ -415,64 +420,66 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           }
         `}</style>
 
-        <div className="text-center max-w-5xl mx-auto mb-24 animate-fade-in">
+        <div className="text-center max-w-5xl mx-auto mb-16 sm:mb-24 animate-fade-in">
 
-          {/* BIG LOGO & TITLE */}
-          <div className="flex items-center justify-center gap-1 mb-8 -ml-4 md:-ml-8 transition-all">
+          {/* BIG LOGO & TITLE - stack on mobile to avoid overflow */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-1 mb-6 sm:mb-8 transition-all">
             <img
               src="/ChatGPT Image Jan 15, 2026, 09_03_32 PM.png"
-              alt="RoomMate Logo"
-              className="md:w-30 md:h-40 object-contain"
+              alt="RoomMate"
+              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain shrink-0"
             />
-            <span className="font-extrabold text-4xl sm:text-5xl md:text-7xl lg:text-8xl tracking-tight leading-none">
+            <span className="text-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl 2xl:text-8xl tracking-tight leading-none">
               <TypewriterTitle text="Room Mate" />
             </span>
           </div>
 
           {/* FINANCIAL / TRUST BADGE */}
-          <div className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary/10 text-primary text-base font-medium mb-6 border border-primary/20">
-            <Wallet className="h-5 w-5" />
-            Smart expense splitting for roommates
+          <div className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-primary/10 text-primary text-sm sm:text-base font-medium mb-4 sm:mb-6 border border-primary/20 max-w-[95vw]">
+            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+            <span className="break-words">Smart expense splitting for roommates</span>
           </div>
 
           {/* PUNCHLINE — FINtech STYLE */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-3 sm:mb-4 leading-tight tracking-tight px-1">
             Split expenses,{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 pb-2">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 pb-2 block sm:inline">
               not friendships
             </span>
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground font-medium mb-8 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-medium mb-6 sm:mb-8 max-w-2xl mx-auto px-1">
             Track. Split. Settle. — UPI-ready, no hassle.
           </p>
 
           {/* TYPEWRITER TEXT */}
-          <Typewriter />
+          <div className="min-h-[3rem] sm:min-h-0">
+            <Typewriter />
+          </div>
 
-          <div className="flex flex-col sm:flex-row gap-5 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center px-2">
             <Button
               variant="hero"
               size="xl"
               onClick={() => session ? setMode('create') : navigate("/auth")}
-              className="text-xl h-14 px-10 group"
+              className="text-base sm:text-xl h-12 sm:h-14 px-6 sm:px-10 group w-full sm:w-auto"
             >
-              <Building2 className="h-6 w-6 mr-2" />
+              <Building2 className="h-5 w-5 sm:h-6 sm:w-6 mr-2 shrink-0" />
               Create Hostel
-              <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform shrink-0" />
             </Button>
             <Button
               variant="outline"
               size="xl"
               onClick={() => session ? setMode('join') : navigate("/auth")}
-              className="text-xl h-14 px-8"
+              className="text-base sm:text-xl h-12 sm:h-14 px-6 sm:px-8 w-full sm:w-auto"
             >
-              <Users className="h-6 w-6 mr-2" />
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 mr-2 shrink-0" />
               Join with Code
             </Button>
           </div>
 
           {/* TRUST INDICATORS + BRANDING */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 mt-10 text-base text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4 mt-8 sm:mt-10 text-sm sm:text-base text-muted-foreground px-2">
 
             {/* 1. Instant Setup */}
             <div className="flex items-center gap-2 animate-wave-shine" style={{ animationDelay: '0s' }}>
@@ -516,28 +523,28 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           </div>
 
           {/* Hero Carousel - How it Works */}
-          <div className="mt-16 animate-fade-in" style={{ animationDelay: '1.2s' }}>
+          <div className="mt-10 sm:mt-16 animate-fade-in overflow-hidden" style={{ animationDelay: '1.2s' }}>
             <HowItWorksCarousel />
           </div>
 
           {/* ADDED MISSING GREEN CTA BUTTON */}
-          <div className="mt-10 animate-fade-in" style={{ animationDelay: '1.5s' }}>
+          <div className="mt-8 sm:mt-10 animate-fade-in px-2" style={{ animationDelay: '1.5s' }}>
             <Button
               size="lg"
               onClick={() => session ? setMode('create') : navigate("/auth")}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-6 rounded-2xl text-lg font-bold shadow-xl shadow-emerald-600/20 active:scale-95 transition-all"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-10 py-5 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl shadow-emerald-600/20 active:scale-95 transition-all w-full sm:w-auto"
             >
               Get Started Now — It&apos;s Free 🚀
             </Button>
-            <p className="text-xs text-muted-foreground mt-4 font-medium uppercase tracking-[0.2em]">No credit card • UPI linking • Instant access</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-3 sm:mt-4 font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em] px-2">No credit card • UPI linking • Instant access</p>
           </div>
         </div>
 
 
         {/* Floating Preview Card - CENTERED CONTENT */}
-        <div className="max-w-6xl mx-auto mb-24 md:mb-28" id="preview-card-section">
-          <Card variant="elevated" className="p-8 md:p-12 bg-gradient-to-br from-card via-card to-primary/5 border-2 shadow-2xl backdrop-blur-sm bg-white/50 dark:bg-card/50">
-            <div className="grid md:grid-cols-3 gap-10">
+        <div className="max-w-6xl mx-auto mb-16 sm:mb-24 md:mb-28 px-0 sm:px-2" id="preview-card-section">
+          <Card variant="elevated" className="p-4 sm:p-6 md:p-8 lg:p-12 bg-gradient-to-br from-card via-card to-primary/5 border-2 shadow-2xl backdrop-blur-sm bg-white/50 dark:bg-card/50 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
 
               {/* Card 1: Quick Balance (Centered Vertically) */}
               <div className="flex flex-col h-full">
@@ -654,12 +661,12 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
         </div>
 
         {/* Features Grid */}
-        <div id="features-section" className="mb-32">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Everything you need 💡</h2>
-          <p className="text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
+        <div id="features-section" className="mb-20 sm:mb-32 px-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4">Everything you need 💡</h2>
+          <p className="text-base sm:text-xl text-muted-foreground text-center mb-10 sm:mb-16 max-w-2xl mx-auto px-2">
             Simple tools to manage shared living expenses without the headaches
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto overflow-hidden p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto overflow-hidden">
             {features.map((feature, i) => (
               <Card
                 key={feature.title}
@@ -685,38 +692,38 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
         </div>
 
         {/* Use Cases */}
-        <div className="mb-24 md:mb-28" id="use-cases-section">
-          <h2 className={`text-3xl md:text-4xl font-bold text-center mb-4 transition-all duration-500 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>Perfect for hostel life 🏠</h2>
-          <p className={`text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto transition-all duration-500 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`} style={{ transitionDelay: useCasesVisible ? '100ms' : '0ms' }}>
+        <div className="mb-16 sm:mb-24 md:mb-28 px-2" id="use-cases-section">
+          <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 transition-all duration-500 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>Perfect for hostel life 🏠</h2>
+          <p className={`text-base sm:text-xl text-muted-foreground text-center mb-10 sm:mb-16 max-w-2xl mx-auto transition-all duration-500 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`} style={{ transitionDelay: useCasesVisible ? '100ms' : '0ms' }}>
             Track everything from daily snacks to monthly bills
           </p>
-          <div className="flex flex-wrap justify-center gap-5 max-w-5xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-5 max-w-5xl mx-auto">
             {useCases.map((useCase, i) => (
               <div
                 key={useCase.title}
-                className={`flex items-center gap-4 px-6 py-4 rounded-full bg-gradient-to-br from-muted/50 to-muted/30 hover:from-muted hover:to-muted/50 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out group cursor-pointer border border-border/40 hover:border-primary/40 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}
+                className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 rounded-full bg-gradient-to-br from-muted/50 to-muted/30 hover:from-muted hover:to-muted/50 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out group cursor-pointer border border-border/40 hover:border-primary/40 ${useCasesVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: useCasesVisible ? `${i * 80}ms` : '0ms' }}
               >
                 <span className="text-3xl group-hover:scale-125 transition-transform duration-300 inline-block group-hover:-rotate-12">{useCase.emoji}</span>
-                <span className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground group-hover:from-primary group-hover:to-primary/70 transition-all duration-300">{useCase.title}</span>
+                <span className="text-sm sm:text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground group-hover:from-primary group-hover:to-primary/70 transition-all duration-300">{useCase.title}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Testimonials */}
-        <div className="mb-24 md:mb-28" id="testimonials-section">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Loved by students 💜</h2>
-          <p className="text-xl text-muted-foreground text-center mb-16">
+        <div className="mb-16 sm:mb-24 md:mb-28 px-2" id="testimonials-section">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4">Loved by students 💜</h2>
+          <p className="text-base sm:text-xl text-muted-foreground text-center mb-10 sm:mb-16">
             Join thousands of happy hostelites
           </p>
-          <div className="relative overflow-hidden w-full py-6 mask-linear-fade">
-            <div className="flex animate-marquee gap-8 w-max hover:pause-animation">
+          <div className="relative overflow-hidden w-full max-w-[100vw] py-6 -mx-2 sm:mx-0 mask-linear-fade">
+            <div className="flex animate-marquee gap-4 sm:gap-8 w-max hover:pause-animation">
               {[...testimonials, ...testimonials].map((testimonial, i) => (
                 <Card
                   key={`${testimonial.name}-${i}`}
                   variant="elevated"
-                  className="w-[400px] shrink-0 hover:scale-105 transition-transform duration-300"
+                  className="w-[280px] min-[400px]:w-[320px] sm:w-[400px] shrink-0 hover:scale-105 transition-transform duration-300"
                 >
                   <CardContent className="pt-8">
                     <div className="flex items-center gap-1.5 mb-5">
@@ -742,25 +749,25 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
         </div>
 
         {/* CTA Section - DANCING LIGHTS (STATIC) */}
-        <div className="relative overflow-hidden py-20 px-8 rounded-[3rem] bg-gradient-to-br from-card via-accent/5 to-primary/5 border border-border/50 shadow-xl mb-12 group">
+        <div className="relative overflow-hidden py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 rounded-2xl sm:rounded-[3rem] bg-gradient-to-br from-card via-accent/5 to-primary/5 border border-border/50 shadow-xl mb-8 sm:mb-12 group">
 
           {/* Dancing Lights Background */}
           <DancingLights />
 
           <div className="relative z-10 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to simplify your hostel finances? 🚀</h2>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Create your hostel in seconds and start tracking expenses today. It's free forever!
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-1">Ready to simplify your hostel finances? 🚀</h2>
+            <p className="text-base sm:text-xl md:text-2xl text-muted-foreground mb-6 sm:mb-10 max-w-2xl mx-auto px-2">
+              Create your hostel in seconds and start tracking expenses today. It&apos;s free forever!
             </p>
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-6 sm:mt-8">
               <Button
                 variant="hero"
                 size="xl"
                 onClick={() => session ? setMode('create') : navigate("/auth")}
-                className="text-xl h-14 px-10 group"
+                className="text-base sm:text-xl h-12 sm:h-14 px-6 sm:px-10 group w-full sm:w-auto max-w-xs sm:max-w-none"
               >
                 Get Started Free
-                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </div>
           </div>

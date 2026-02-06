@@ -72,10 +72,10 @@ Scenario: Groceries Purchase
 - **Selective Bill Splitting**: Choose to split expenses equally across all members or with specific roommates
 - **Income Tracking**: Record extra funds, refunds, and contributions to adjust the monthly budget
 - **Automatic Calculations**: Instantly see who owes whom with real-time balance updates
-- **UPI QR Integration**: Personalize your profile with UPI ID and QR codes for seamless debt settlement
+- **UPI Linking**: Add your UPI ID in profile — the app generates a payment QR automatically so roommates can scan to pay you. Optional custom QR upload supported.
 
 ### 📊 Financial Insights & Visualization
-- **Spending Heatmap**: Interactive daily spending visualization with global relative scaling for accurate financial perspective
+- **Spending Heatmap**: Daily spending intensity scaled to **max spent in a single day that month** (per-month scaling) for a clear view of busy vs light days
 - **Balance Summary**: Visual "Who Owes Whom" overview with status indicators and quick-pay actions
 - **Spending Charts**: Analyze expense categories and trends with interactive Recharts visualizations
 - **Budget Monitoring**: Real-time warnings and visual status (🟢, 🟡, 🔴) when approaching monthly limits
@@ -84,7 +84,7 @@ Scenario: Groceries Purchase
 ### 🛠️ Maintenance & Hostel Operations
 - **Maintenance Tracker**: Dedicated system for reporting hostel issues with status tracking (Pending → Resolving → Resolved)
 - **Mess Management**: Weekly menu dashboard for tracking breakfast, lunch, and dinner schedules
-- **Announcements System**: Broadcast urgent hostel updates to all members with high-visibility alerts
+- **Announcements & Notifications**: Publish from Complaints or Lost & Found → all members get a **notification** (bell icon with red dot). Tapping opens the notification, "View in Complaints" redirects to that page, and the announcement is dismissed from the strip once seen.
 - **Lost & Found**: Centralized portal for posting and tracking misplaced items within the hostel
 
 ### 🤖 Smart AI Assistance
@@ -96,10 +96,13 @@ Scenario: Groceries Purchase
 
 ## 🚀 Recent Updates
 
-- **Interactive Spending Heatmap**: Relative daily spending intensity across all recorded history
+- **Spending Heatmap**: Per-month scaling (max spent in a day that month) for clearer daily intensity
+- **Announcements → Notifications**: Complaints/Lost & Found announcements create notifications; tap to open, redirect to the right tab, and dismiss from the list
+- **Mobile-First UI**: Responsive landing page and dashboard; **bottom navigation** on mobile (Dashboard, History, Complaints, Mess) and compact header with menu sheet
+- **Landing & Navbar**: Fintech-style copy, responsive hero, and fixed pre-login navbar that stays usable on small screens
+- **UPI QR from ID**: Profile UPI ID auto-generates a scannable payment QR (no upload required); optional custom QR image still supported
 - **Unified Support Center**: Combined Maintenance Tracker and Lost & Found portal
 - **Mess Menu Dashboard**: Weekly meal scheduling system for hostel owners and members
-- **Personalized Payments**: UPI ID and QR code integration for faster settlements
 - **Broadcast System**: High-priority announcements for critical hostel communications
 - **AI Advisor Integration**: Smart budget assistant powered by Google Gemini
 - **Automated Recurring Bills**: Monthly automation for fixed expenses like WiFi and Rent
@@ -143,7 +146,7 @@ Scenario: Groceries Purchase
 src/
 ├── components/
 │   ├── dashboard/          # Dashboard-related components
-│   │   ├── Dashboard.tsx   # Main dashboard container
+│   │   ├── Dashboard.tsx   # Main dashboard (tabs, mobile bottom nav, header)
 │   │   ├── BalanceSummary.tsx
 │   │   ├── BudgetTracker.tsx
 │   │   ├── ExpenseForm.tsx
@@ -152,12 +155,21 @@ src/
 │   │   ├── MembersList.tsx
 │   │   ├── MonthlyHistory.tsx
 │   │   ├── SpendingCharts.tsx
+│   │   ├── SpendingHeatmap.tsx
 │   │   ├── UtilityBills.tsx
+│   │   ├── RecurringBills.tsx
 │   │   ├── NotificationBell.tsx
-│   │   └── BroadcastDialog.tsx
-│   ├── landing/            # Landing page
+│   │   ├── NotificationPopup.tsx
+│   │   ├── AnnouncementsList.tsx
+│   │   ├── BroadcastDialog.tsx
+│   │   ├── ComplaintsDashboard.tsx
+│   │   ├── ComplaintsList.tsx
+│   │   ├── LostAndFoundList.tsx
+│   │   ├── MessDashboard.tsx
+│   │   └── [AISpendingAdvisor, EchoVoiceAssistant, etc.]
+│   ├── landing/            # Landing page (LandingPage, HowItWorksCarousel)
 │   ├── ui/                 # shadcn/ui components
-│   └── [Layout components]
+│   └── [Footer, ThemeToggle, UserMenu, ShareButton, HostelDialog, ...]
 ├── hooks/
 │   ├── useHostel.ts       # Main data fetching hooks
 │   ├── use-toast.ts
@@ -239,9 +251,12 @@ src/
 - `sender_id` (UUID) - Sender member ID
 - `actor_name` (TEXT) - Actor's name
 - `type` (ENUM) - bill | payment | reminder | broadcast
-- `content` (TEXT) - Notification message
+- `content` (TEXT) - Notification message (may contain JSON for announcement redirects)
 - `is_read` (BOOLEAN) - Read status
 - `created_at` (TIMESTAMP)
+
+### profiles (for UPI)
+- Ensure `profiles` has `upi_id` (TEXT) and `upi_qr_url` (TEXT) if using UPI linking and QR generation.
 
 ---
 
@@ -307,11 +322,11 @@ npm run preview
 
 ## 🔒 Authentication Flow
 
-1. **Landing Page** → Public access
+1. **Landing Page** → Public access (responsive; works on mobile)
 2. **Auth Page** → Email/password authentication via Supabase
-3. **Profile Setup** → Create user profile with name
+3. **Profile Setup** → Create user profile (name, optional UPI ID; QR is auto-generated from UPI ID)
 4. **Lobby** → Create a new hostel or join existing one using 6-digit code
-5. **Dashboard** → Main app interface for expense and hostel management
+5. **Dashboard** → Main app (desktop: top tabs; mobile: bottom nav + menu sheet for actions)
 
 ---
 
