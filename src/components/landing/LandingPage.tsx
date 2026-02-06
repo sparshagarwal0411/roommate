@@ -429,19 +429,22 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
             </span>
           </div>
 
-          {/* INSTANT SETUP BADGE */}
-          <div className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary/10 text-primary text-base font-medium mb-8">
-            <Sparkles className="h-5 w-5" />
-            Instant Setup • 100% free
+          {/* FINANCIAL / TRUST BADGE */}
+          <div className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary/10 text-primary text-base font-medium mb-6 border border-primary/20">
+            <Wallet className="h-5 w-5" />
+            Smart expense splitting for roommates
           </div>
 
-          {/* PUNCHLINE WITH STATIC GRADIENT (TEAL -> BLUE -> PURPLE) */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight">
+          {/* PUNCHLINE — FINtech STYLE */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight tracking-tight">
             Split expenses,{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 pb-2">
               not friendships
             </span>
           </h1>
+          <p className="text-lg sm:text-xl text-muted-foreground font-medium mb-8 max-w-2xl mx-auto">
+            Track. Split. Settle. — UPI-ready, no hassle.
+          </p>
 
           {/* TYPEWRITER TEXT */}
           <Typewriter />
@@ -524,9 +527,9 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
               onClick={() => session ? setMode('create') : navigate("/auth")}
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-6 rounded-2xl text-lg font-bold shadow-xl shadow-emerald-600/20 active:scale-95 transition-all"
             >
-              Get Started Now — It's Free 🚀
+              Get Started Now — It&apos;s Free 🚀
             </Button>
-            <p className="text-xs text-muted-foreground mt-4 font-medium uppercase tracking-[0.2em]">No credit card required • Instant access</p>
+            <p className="text-xs text-muted-foreground mt-4 font-medium uppercase tracking-[0.2em]">No credit card • UPI linking • Instant access</p>
           </div>
         </div>
 

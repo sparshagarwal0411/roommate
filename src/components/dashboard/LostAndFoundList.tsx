@@ -26,7 +26,8 @@ import {
     useAddLostAndFound,
     useUpdateLostAndFoundStatus,
     LostAndFound,
-    useAddAnnouncement
+    useAddAnnouncement,
+    useAddNotification
 } from "@/hooks/useHostel";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
     const addItem = useAddLostAndFound();
     const updateStatus = useUpdateLostAndFoundStatus();
     const addAnnouncement = useAddAnnouncement();
+    const addNotification = useAddNotification();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [title, setTitle] = useState("");
@@ -82,13 +84,26 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
 
     const handlePublishAnnouncement = async (item: LostAndFound) => {
         try {
-            await addAnnouncement.mutateAsync({
+            const ann = await addAnnouncement.mutateAsync({
                 hostel_id: hostelId,
                 title: `${item.type.toUpperCase()}: ${item.title}`,
                 content: `${item.description}\n\nContact: ${item.contact_info || "Not provided"}`,
                 type: 'info'
             });
-            toast.success("Broadcasted to all roommates! 📢");
+            const actorName = members.find(m => m.id === currentMemberId)?.name || "Hostel";
+            const payload = JSON.stringify({ announcementId: ann.id, link: 'lostfound', title: ann.title, content: ann.content });
+            for (const member of members) {
+                if (member.id === currentMemberId) continue;
+                await addNotification.mutateAsync({
+                    hostel_id: hostelId,
+                    recipient_id: member.id,
+                    sender_id: currentMemberId!,
+                    actor_name: actorName,
+                    type: 'broadcast',
+                    content: payload,
+                });
+            }
+            toast.success("Broadcasted to all roommates! 📢 Notifications sent.");
         } catch (error) {
             toast.error("Failed to broadcast");
         }

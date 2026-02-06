@@ -20,7 +20,8 @@ import {
     useComplaints,
     useAddComplaint,
     useUpdateComplaintStatus,
-    useAddAnnouncement
+    useAddAnnouncement,
+    useAddNotification
 } from "@/hooks/useHostel";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
@@ -69,13 +70,26 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
 
     const handlePublishAnnouncement = async (complaint: Complaint) => {
         try {
-            await addAnnouncement.mutateAsync({
+            const ann = await addAnnouncement.mutateAsync({
                 hostel_id: hostelId,
                 title: `Broadcast: ${complaint.title}`,
                 content: complaint.description,
                 type: 'urgent'
             });
-            toast.success("Published as Announcement! 📢");
+            const actorName = members.find(m => m.id === currentMemberId)?.name || "Hostel";
+            const payload = JSON.stringify({ announcementId: ann.id, link: 'complaints', title: ann.title, content: ann.content });
+            for (const member of members) {
+                if (member.id === currentMemberId) continue;
+                await addNotification.mutateAsync({
+                    hostel_id: hostelId,
+                    recipient_id: member.id,
+                    sender_id: currentMemberId!,
+                    actor_name: actorName,
+                    type: 'broadcast',
+                    content: payload,
+                });
+            }
+            toast.success("Published as Announcement! 📢 Notifications sent.");
         } catch (error) {
             toast.error("Failed to publish announcement");
         }

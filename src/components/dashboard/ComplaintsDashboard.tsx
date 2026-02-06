@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Member } from "@/hooks/useHostel";
 import { ComplaintsList } from "./ComplaintsList";
@@ -11,9 +10,15 @@ interface ComplaintsDashboardProps {
     members: Member[];
     isOwner: boolean;
     currentMemberId: string | undefined;
+    defaultTab?: "maintenance" | "lostfound";
 }
 
-export const ComplaintsDashboard = ({ hostelId, members, isOwner, currentMemberId }: ComplaintsDashboardProps) => {
+export const ComplaintsDashboard = ({ hostelId, members, isOwner, currentMemberId, defaultTab }: ComplaintsDashboardProps) => {
+    const [tab, setTab] = useState<"maintenance" | "lostfound">(defaultTab || "maintenance");
+    useEffect(() => {
+        if (defaultTab) setTab(defaultTab);
+    }, [defaultTab]);
+
     return (
         <div className="space-y-6 animate-fade-in">
             <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-2xl border border-primary/10">
@@ -25,7 +30,7 @@ export const ComplaintsDashboard = ({ hostelId, members, isOwner, currentMemberI
                 </p>
             </div>
 
-            <Tabs defaultValue="maintenance" className="w-full">
+            <Tabs value={tab} onValueChange={(v) => setTab(v as "maintenance" | "lostfound")} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
                     <TabsTrigger value="maintenance" className="gap-2">
                         <MessageSquare className="h-4 w-4" />

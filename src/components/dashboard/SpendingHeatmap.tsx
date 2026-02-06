@@ -7,10 +7,9 @@ import { cn } from '@/lib/utils';
 interface SpendingHeatmapProps {
     month: string; // YYYY-MM
     expenses: Expense[];
-    maxSpending?: number;
 }
 
-export const SpendingHeatmap = ({ month, expenses, maxSpending: propsMaxSpending }: SpendingHeatmapProps) => {
+export const SpendingHeatmap = ({ month, expenses }: SpendingHeatmapProps) => {
     const monthDate = parseISO(`${month}-01`);
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
@@ -23,7 +22,8 @@ export const SpendingHeatmap = ({ month, expenses, maxSpending: propsMaxSpending
         dailyTotals[dStr] = (dailyTotals[dStr] || 0) + Number(e.amount);
     });
 
-    const maxSpending = propsMaxSpending || Math.max(...Object.values(dailyTotals), 1);
+    // Scale relative to max spent in a single day *this month* (not global max)
+    const maxSpendingThisMonth = Math.max(...Object.values(dailyTotals), 1);
 
     // Padding for the start of the week (0 = Sunday)
     const firstDayOfWeek = getDay(monthStart);
@@ -38,7 +38,7 @@ export const SpendingHeatmap = ({ month, expenses, maxSpending: propsMaxSpending
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-muted/50 rounded-full">
                     <div className="w-2 h-2 rounded-full bg-primary/30" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Global Max: ₹{maxSpending.toLocaleString()}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Max this month: ₹{maxSpendingThisMonth.toLocaleString()}</span>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ export const SpendingHeatmap = ({ month, expenses, maxSpending: propsMaxSpending
                 {daysInMonth.map((day) => {
                     const dStr = format(day, 'yyyy-MM-dd');
                     const total = dailyTotals[dStr] || 0;
-                    const ratio = total / maxSpending;
+                    const ratio = total / maxSpendingThisMonth;
 
                     // Scale from 30% to 100% of the cell size for non-zero spending
                     const scale = total > 0 ? 30 + (ratio * 70) : 0;

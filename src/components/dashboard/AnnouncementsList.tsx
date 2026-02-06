@@ -1,9 +1,10 @@
-
-import { Megaphone, AlertTriangle, Info, Calendar, X } from "lucide-react";
+import { useMemo } from "react";
+import { Megaphone, AlertTriangle, Info, Calendar } from "lucide-react";
 import { useAnnouncements, Announcement } from "@/hooks/useHostel";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+
+const DISMISSED_ANNOUNCEMENTS_KEY = "roommate_dismissed_announcements";
 
 interface AnnouncementsListProps {
     hostelId: string;
@@ -12,8 +13,14 @@ interface AnnouncementsListProps {
 export const AnnouncementsList = ({ hostelId }: AnnouncementsListProps) => {
     const { data: announcements = [], isLoading } = useAnnouncements(hostelId);
 
+    const visibleAnnouncements = useMemo(() => {
+        if (typeof window === "undefined") return announcements;
+        const dismissed: string[] = JSON.parse(localStorage.getItem(DISMISSED_ANNOUNCEMENTS_KEY) || "[]");
+        return announcements.filter((a) => !dismissed.includes(a.id));
+    }, [announcements]);
+
     if (isLoading) return null;
-    if (announcements.length === 0) return null;
+    if (visibleAnnouncements.length === 0) return null;
 
     const getTypeStyles = (type: Announcement['type']) => {
         switch (type) {
@@ -40,7 +47,7 @@ export const AnnouncementsList = ({ hostelId }: AnnouncementsListProps) => {
             </div>
 
             <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none snap-x">
-                {announcements.map((announcement) => (
+                {visibleAnnouncements.map((announcement) => (
                     <div
                         key={announcement.id}
                         className={cn(

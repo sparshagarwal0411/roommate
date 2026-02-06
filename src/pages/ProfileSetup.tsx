@@ -10,8 +10,9 @@ import { toast } from "sonner";
 import {
     User, Users, MapPin, Phone, Calendar,
     Circle, Square, Triangle, Hexagon, X,
-    CreditCard, Camera, Loader2
+    CreditCard, Camera, Loader2, QrCode
 } from "lucide-react";
+import QRCode from "qrcode";
 
 const ProfileSetup = () => {
     const [loading, setLoading] = useState(true);
@@ -84,6 +85,17 @@ const ProfileSetup = () => {
         upi_qr_url: "",
     });
     const [isUploading, setIsUploading] = useState(false);
+    const [generatedUpiQr, setGeneratedUpiQr] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!profile.upi_id?.trim()) {
+            setGeneratedUpiQr(null);
+            return;
+        }
+        const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "RoomMate";
+        const upiUri = `upi://pay?pa=${encodeURIComponent(profile.upi_id.trim())}&pn=${encodeURIComponent(name)}`;
+        QRCode.toDataURL(upiUri, { width: 200, margin: 2 }).then(setGeneratedUpiQr).catch(() => setGeneratedUpiQr(null));
+    }, [profile.upi_id, profile.first_name, profile.last_name]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -369,12 +381,27 @@ const ProfileSetup = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label>UPI QR Code (Optional)</Label>
+                                <Label className="flex items-center gap-2">
+                                    <QrCode className="h-4 w-4" />
+                                    UPI QR Code &amp; Link (Optional)
+                                </Label>
+                                <p className="text-xs text-muted-foreground">
+                                    Add your UPI ID above — we&apos;ll generate a payment QR. Roommates can scan to pay you.
+                                </p>
+                                {generatedUpiQr && (
+                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                                        <img src={generatedUpiQr} alt="UPI QR" className="h-24 w-24 rounded-lg border bg-white" />
+                                        <div>
+                                            <p className="text-xs font-semibold text-primary">Generated from UPI ID</p>
+                                            <p className="text-[11px] text-muted-foreground">Scan with PhonePe, GPay, or any UPI app</p>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-4">
                                     <label htmlFor="qr-upload" className="cursor-pointer flex-1">
                                         <div className="flex items-center justify-center gap-2 border-2 border-dashed rounded-xl py-2 hover:bg-muted/50 transition-all text-xs text-muted-foreground uppercase font-semibold">
                                             {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                                            {isUploading ? "Uploading..." : profile.upi_qr_url ? "Change QR" : "Upload QR"}
+                                            {isUploading ? "Uploading..." : profile.upi_qr_url ? "Change custom QR" : "Or upload custom QR image"}
                                         </div>
                                         <input
                                             id="qr-upload"
@@ -387,7 +414,7 @@ const ProfileSetup = () => {
                                     </label>
                                     {profile.upi_qr_url && (
                                         <div className="h-10 w-10 rounded-lg border overflow-hidden bg-muted flex items-center justify-center">
-                                            <img src={profile.upi_qr_url} alt="QR" className="h-full w-full object-cover" />
+                                            <img src={profile.upi_qr_url} alt="Custom QR" className="h-full w-full object-cover" />
                                         </div>
                                     )}
                                 </div>

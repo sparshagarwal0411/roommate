@@ -1,9 +1,8 @@
-import { Bell, CreditCard, Receipt, MessageCircle, Check, Megaphone, X } from "lucide-react";
+import { Bell, CreditCard, Receipt, MessageCircle, Megaphone, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -11,14 +10,30 @@ import { Badge } from "@/components/ui/badge";
 import { useNotifications, useMarkNotificationRead, Notification } from "@/hooks/useHostel";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+const DISMISSED_ANNOUNCEMENTS_KEY = "roommate_dismissed_announcements";
+
+function parseAnnouncementPayload(content: string): { announcementId: string; link: string; title: string; content: string } | null {
+    try {
+        const p = JSON.parse(content) as unknown;
+        if (p && typeof p === "object" && "announcementId" in p && "link" in p) return p as { announcementId: string; link: string; title: string; content: string };
+    } catch { /* ignore */ }
+    return null;
+}
+
+function getNotificationDisplayContent(n: Notification): string {
+    const parsed = parseAnnouncementPayload(n.content);
+    if (parsed) return parsed.title;
+    return n.content;
+}
 
 interface NotificationBellProps {
     memberId: string | null;
+    onNavigateTo?: (view: "complaints", subTab?: "maintenance" | "lostfound") => void;
 }
 
-export const NotificationBell = ({ memberId }: NotificationBellProps) => {
+export const NotificationBell = ({ memberId, onNavigateTo }: NotificationBellProps) => {
     const { data: notifications = [], refetch } = useNotifications(memberId);
     const markRead = useMarkNotificationRead();
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -35,6 +50,26 @@ export const NotificationBell = ({ memberId }: NotificationBellProps) => {
                 console.error("Failed to mark notification as read", error);
             }
         }
+    };
+
+    const handleViewAnnouncement = async () => {
+        if (!selectedNotification) return;
+        const parsed = parseAnnouncementPayload(selectedNotification.content);
+        if (!parsed || !onNavigateTo) return;
+        if (!selectedNotification.is_read) {
+            try {
+                await markRead.mutateAsync(selectedNotification.id);
+            } catch (e) {
+                console.error("Failed to mark as read", e);
+            }
+        }
+        const dismissed: string[] = JSON.parse(localStorage.getItem(DISMISSED_ANNOUNCEMENTS_KEY) || "[]");
+        if (!dismissed.includes(parsed.announcementId)) {
+            dismissed.push(parsed.announcementId);
+            localStorage.setItem(DISMISSED_ANNOUNCEMENTS_KEY, JSON.stringify(dismissed));
+        }
+        onNavigateTo("complaints", parsed.link === "lostfound" ? "lostfound" : "maintenance");
+        setDialogOpen(false);
     };
 
     const handlePrevious = async () => {
@@ -133,8 +168,17 @@ export const NotificationBell = ({ memberId }: NotificationBellProps) => {
                                     )}
                                 </div>
                                 <p className="text-sm leading-relaxed text-foreground">
-                                    {selectedNotification.content}
+                                    {(() => {
+                                        const parsed = parseAnnouncementPayload(selectedNotification.content);
+                                        if (parsed) return <><span className="font-semibold">{parsed.title}</span><br />{parsed.content}</>;
+                                        return selectedNotification.content;
+                                    })()}
                                 </p>
+                                {parseAnnouncementPayload(selectedNotification.content) && onNavigateTo && (
+                                    <Button size="sm" className="gap-2 mt-2" onClick={handleViewAnnouncement}>
+                                        View in Complaints <ArrowRight className="h-4 w-4" />
+                                    </Button>
+                                )}
                             </div>
 
                             {/* Notification List */}
@@ -160,7 +204,7 @@ export const NotificationBell = ({ memberId }: NotificationBellProps) => {
                                                     <div className="min-w-0 flex-1">
                                                         <p className="text-xs font-semibold truncate">{n.actor_name}</p>
                                                         <p className="text-[11px] text-muted-foreground line-clamp-2">
-                                                            {n.content}
+                                                            {getNotificationDisplayContent(n)}
                                                         </p>
                                                     </div>
                                                 </div>

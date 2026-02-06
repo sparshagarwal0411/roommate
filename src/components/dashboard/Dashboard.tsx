@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Building2, LogOut, DoorOpen, Trash2, Pencil, Check, X } from "lucide-react";
+import { Building2, LogOut, DoorOpen, Trash2, Pencil, Check, X, LayoutDashboard, History, MessageSquare, Utensils, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +54,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 interface DashboardProps {
   hostelId: string;
@@ -81,7 +83,8 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const resetBalances = useResetBalances();
 
-  const [viewMode, setViewMode] = useState<"current" | "history" | "complaints">("current");
+  const [viewMode, setViewMode] = useState<"current" | "history" | "complaints" | "mess">("current");
+  const [complaintsSubTab, setComplaintsSubTab] = useState<"maintenance" | "lostfound">("maintenance");
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [alertedThresholds, setAlertedThresholds] = useState<{ [key: string]: Set<number> }>(
     () => ({
@@ -286,11 +289,18 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
     );
   }
 
+  const navItems: { value: typeof viewMode; label: string; icon: React.ReactNode }[] = [
+    { value: "current", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { value: "history", label: "History", icon: <History className="h-5 w-5" /> },
+    { value: "complaints", label: "Complaints", icon: <MessageSquare className="h-5 w-5" /> },
+    { value: "mess", label: "Mess", icon: <Utensils className="h-5 w-5" /> },
+  ];
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-50 glass border-b drop-shadow-sm">
-        <div className="container flex items-center justify-between h-16 gap-4">
-          <div className="flex items-center gap-2 overflow-hidden">
+        <div className="container flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4 px-3 sm:px-4">
+          <div className="flex items-center gap-2 overflow-hidden min-w-0">
             <div
               className="cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/')}
@@ -363,66 +373,127 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <ShareButton
-              hostelCode={hostel?.code || ""}
-              hostelName={hostel?.name || ""}
-              roomNo={hostel?.room_no}
-            />
-            {isOwner && me && (
-              <BroadcastDialog members={members} currentMemberId={me.id} />
-            )}
-            <NotificationBell memberId={me?.id || null} />
-            <NotificationPopup memberId={me?.id || null} />
-            <ThemeToggle />
-            <UserMenu />
-
-            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="hidden sm:block">
-              <TabsList className="bg-muted/50">
-                <TabsTrigger value="current" className="text-xs">Dashboard</TabsTrigger>
-                <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
-                <TabsTrigger value="complaints" className="text-xs">Complaints</TabsTrigger>
-                <TabsTrigger value="mess" className="text-xs">Mess</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            {isOwner && (
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Desktop: full actions + tabs */}
+            <div className="hidden sm:flex items-center gap-2">
+              <ShareButton
+                hostelCode={hostel?.code || ""}
+                hostelName={hostel?.name || ""}
+                roomNo={hostel?.room_no}
+              />
+              {isOwner && me && (
+                <BroadcastDialog members={members} currentMemberId={me.id} />
+              )}
+              <NotificationBell
+                memberId={me?.id || null}
+                onNavigateTo={(view, subTab) => {
+                  setViewMode(view);
+                  if (subTab) setComplaintsSubTab(subTab);
+                }}
+              />
+              <NotificationPopup memberId={me?.id || null} />
+              <ThemeToggle />
+              <UserMenu />
+              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
+                <TabsList className="bg-muted/50">
+                  <TabsTrigger value="current" className="text-xs">Dashboard</TabsTrigger>
+                  <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
+                  <TabsTrigger value="complaints" className="text-xs">Complaints</TabsTrigger>
+                  <TabsTrigger value="mess" className="text-xs">Mess</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {isOwner && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 text-warning hover:bg-warning/10" onClick={handleResetBalances} disabled={resetBalances.isPending}>
+                      <DoorOpen className="h-5 w-5 rotate-180" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent><p>Reset Balances (Zero all)</p></TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 text-warning hover:bg-warning/10"
-                    onClick={handleResetBalances}
-                    disabled={resetBalances.isPending}
-                  >
-                    <DoorOpen className="h-5 w-5 rotate-180" />
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10" onClick={isOwner ? handleDeleteHostel : handleExitHostel}>
+                    {isOwner ? <Trash2 className="h-5 w-5" /> : <DoorOpen className="h-5 w-5" />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Reset Balances (Zero all)</p>
-                </TooltipContent>
+                <TooltipContent><p>{isOwner ? "Delete Hostel" : "Leave Hostel"}</p></TooltipContent>
               </Tooltip>
-            )}
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 text-destructive hover:bg-destructive/10"
-                  onClick={isOwner ? handleDeleteHostel : handleExitHostel}
-                >
-                  {isOwner ? <Trash2 className="h-5 w-5" /> : <DoorOpen className="h-5 w-5" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isOwner ? "Delete Hostel" : "Leave Hostel"}</p>
-              </TooltipContent>
-            </Tooltip>
+            </div>
+            {/* Mobile: menu sheet + bell only */}
+            <div className="flex sm:hidden items-center gap-1">
+              <NotificationBell
+                memberId={me?.id || null}
+                onNavigateTo={(view, subTab) => {
+                  setViewMode(view);
+                  if (subTab) setComplaintsSubTab(subTab);
+                }}
+              />
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px] flex flex-col gap-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Navigate</p>
+                  <div className="flex flex-col gap-1">
+                    {navItems.map((item) => (
+                      <Button
+                        key={item.value}
+                        variant={viewMode === item.value ? "secondary" : "ghost"}
+                        className="justify-start gap-3"
+                        onClick={() => setViewMode(item.value)}
+                      >
+                        {item.icon}
+                        {item.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="border-t pt-4 flex flex-col gap-1">
+                    <div className="w-full [&_button]:w-full [&_button]:justify-start">
+                      <ShareButton hostelCode={hostel?.code || ""} hostelName={hostel?.name || ""} roomNo={hostel?.room_no} />
+                    </div>
+                    {isOwner && me && <BroadcastDialog members={members} currentMemberId={me.id} />}
+                    <ThemeToggle />
+                    <UserMenu />
+                    {isOwner && (
+                      <Button variant="ghost" size="sm" className="justify-start text-warning" onClick={handleResetBalances} disabled={resetBalances.isPending}>
+                        <DoorOpen className="h-5 w-5 rotate-180 mr-3" /> Reset Balances
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm" className="justify-start text-destructive" onClick={isOwner ? handleDeleteHostel : handleExitHostel}>
+                      {isOwner ? <Trash2 className="h-5 w-5 mr-3" /> : <DoorOpen className="h-5 w-5 mr-3" />}
+                      {isOwner ? "Delete Hostel" : "Leave Hostel"}
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Mobile bottom navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-background/95 backdrop-blur border-t">
+        <div className="grid grid-cols-4 h-14">
+          {navItems.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => setViewMode(item.value)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors",
+                viewMode === item.value ? "text-primary bg-primary/10" : "text-muted-foreground"
+              )}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
 
       <main className="container py-6 space-y-6">
         <AnnouncementsList hostelId={hostelId} />
@@ -445,6 +516,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
             members={members}
             isOwner={isOwner}
             currentMemberId={me?.id}
+            defaultTab={complaintsSubTab}
           />
         ) : viewMode === "mess" ? (
           <MessDashboard
