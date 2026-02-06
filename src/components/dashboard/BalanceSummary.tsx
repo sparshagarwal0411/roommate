@@ -419,7 +419,6 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
               {/* UPI Payment Section */}
               {(() => {
                 const recipient = members.find(m => m.id === selectedSettlement.to);
-                if (!recipient?.upi_id && !recipient?.upi_qr_url) return null;
 
                 return (
                   <div className="space-y-4 pt-2">
@@ -432,53 +431,64 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
                       </div>
                     </div>
 
-                    <div className="grid gap-3">
-                      {recipient.upi_id && (
-                        <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/10 rounded-xl">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[10px] text-muted-foreground uppercase font-bold">UPI ID</p>
-                            <p className="font-mono text-sm truncate">{recipient.upi_id}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 hover:bg-primary/10"
-                            onClick={() => {
-                              navigator.clipboard.writeText(recipient.upi_id!);
-                              toast.success("UPI ID copied! 📋");
-                            }}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-
-                      {recipient.upi_qr_url && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" className="w-full flex items-center justify-center gap-2 h-10">
-                              <QrCode className="h-4 w-4" />
-                              Show QR Code
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[300px] flex flex-col items-center justify-center pt-8">
-                            <DialogHeader className="text-center w-full">
-                              <DialogTitle>Scan to Pay {recipient.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="mt-4 p-4 bg-white rounded-2xl shadow-inner inline-block">
-                              <img
-                                src={recipient.upi_qr_url}
-                                alt="UPI QR"
-                                className="w-48 h-48 object-contain rounded-lg"
-                              />
+                    {!recipient?.upi_id && !recipient?.upi_qr_url ? (
+                      <div className="p-4 bg-muted/50 rounded-xl border border-dashed text-center">
+                        <p className="text-xs font-medium text-muted-foreground italic">
+                          No UPI connected by {recipient?.name || "Roommate"} 😕
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          Suggest them to update it in Profile Setup!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid gap-3">
+                        {recipient?.upi_id && (
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/10 rounded-xl">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] text-muted-foreground uppercase font-bold">UPI ID</p>
+                              <p className="font-mono text-sm truncate">{recipient.upi_id}</p>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-4 text-center">
-                              Use any UPI app like GPay, PhonePe, or Paytm to scan and pay.
-                            </p>
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                    </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-primary/10"
+                              onClick={() => {
+                                navigator.clipboard.writeText(recipient.upi_id!);
+                                toast.success("UPI ID copied! 📋");
+                              }}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {recipient?.upi_qr_url && (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" className="w-full flex items-center justify-center gap-2 h-10">
+                                <QrCode className="h-4 w-4" />
+                                Show QR Code
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[300px] flex flex-col items-center justify-center pt-8">
+                              <DialogHeader className="text-center w-full">
+                                <DialogTitle>Scan to Pay {recipient.name}</DialogTitle>
+                              </DialogHeader>
+                              <div className="mt-4 p-4 bg-white rounded-2xl shadow-inner inline-block">
+                                <img
+                                  src={recipient.upi_qr_url}
+                                  alt="UPI QR"
+                                  className="w-48 h-48 object-contain rounded-lg"
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-4 text-center">
+                                Use any UPI app like GPay, PhonePe, or Paytm to scan and pay.
+                              </p>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })()}
