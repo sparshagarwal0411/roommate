@@ -420,66 +420,61 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           }
         `}</style>
 
-        <div className="text-center max-w-5xl mx-auto mb-16 sm:mb-24 animate-fade-in">
+        <div className="text-center max-w-5xl mx-auto mb-24 animate-fade-in">
 
-          {/* BIG LOGO & TITLE - stack on mobile to avoid overflow */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-1 mb-6 sm:mb-8 transition-all">
+          {/* BIG LOGO & TITLE */}
+          <div className="flex items-center justify-center gap-1 mb-8 -ml-4 md:-ml-8 transition-all">
             <img
               src="/ChatGPT Image Jan 15, 2026, 09_03_32 PM.png"
-              alt="RoomMate"
-              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain shrink-0"
+              alt="RoomMate Logo"
+              className="w-14 h-14 sm:w-20 sm:h-24 md:w-28 md:h-36 lg:w-32 lg:h-40 object-contain"
             />
-            <span className="text-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl 2xl:text-8xl tracking-tight leading-none">
+            <span className="font-extrabold text-4xl sm:text-5xl md:text-7xl lg:text-8xl tracking-tight leading-none">
               <TypewriterTitle text="Room Mate" />
             </span>
           </div>
 
-          {/* FINANCIAL / TRUST BADGE */}
-          <div className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-primary/10 text-primary text-sm sm:text-base font-medium mb-4 sm:mb-6 border border-primary/20 max-w-[95vw]">
-            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
-            <span className="break-words">Smart expense splitting for roommates</span>
+          {/* INSTANT SETUP BADGE */}
+          <div className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary/10 text-primary text-base font-medium mb-8">
+            <Sparkles className="h-5 w-5" />
+            Instant Setup • 100% free
           </div>
 
-          {/* PUNCHLINE — FINtech STYLE */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-3 sm:mb-4 leading-tight tracking-tight px-1">
+          {/* PUNCHLINE */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight">
             Split expenses,{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 pb-2 block sm:inline">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 pb-2">
               not friendships
             </span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-medium mb-6 sm:mb-8 max-w-2xl mx-auto px-1">
-            Track. Split. Settle. — UPI-ready, no hassle.
-          </p>
 
           {/* TYPEWRITER TEXT */}
-          <div className="min-h-[3rem] sm:min-h-0">
-            <Typewriter />
-          </div>
+          <Typewriter />
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center px-2">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Button
               variant="hero"
               size="xl"
               onClick={() => session ? setMode('create') : navigate("/auth")}
-              className="text-base sm:text-xl h-12 sm:h-14 px-6 sm:px-10 group w-full sm:w-auto"
+              className="text-xl h-14 px-10 group"
             >
-              <Building2 className="h-5 w-5 sm:h-6 sm:w-6 mr-2 shrink-0" />
+              <Building2 className="h-6 w-6 mr-2" />
               Create Hostel
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform shrink-0" />
+              <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
               variant="outline"
               size="xl"
               onClick={() => session ? setMode('join') : navigate("/auth")}
-              className="text-base sm:text-xl h-12 sm:h-14 px-6 sm:px-8 w-full sm:w-auto"
+              className="text-xl h-14 px-8"
             >
-              <Users className="h-5 w-5 sm:h-6 sm:w-6 mr-2 shrink-0" />
+              <Users className="h-6 w-6 mr-2" />
               Join with Code
             </Button>
           </div>
 
           {/* TRUST INDICATORS + BRANDING */}
-          <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4 mt-8 sm:mt-10 text-sm sm:text-base text-muted-foreground px-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 mt-10 text-base text-muted-foreground">
 
             {/* 1. Instant Setup */}
             <div className="flex items-center gap-2 animate-wave-shine" style={{ animationDelay: '0s' }}>
@@ -523,20 +518,20 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           </div>
 
           {/* Hero Carousel - How it Works */}
-          <div className="mt-10 sm:mt-16 animate-fade-in overflow-hidden" style={{ animationDelay: '1.2s' }}>
+          <div className="mt-16 animate-fade-in" style={{ animationDelay: '1.2s' }}>
             <HowItWorksCarousel />
           </div>
 
-          {/* ADDED MISSING GREEN CTA BUTTON */}
-          <div className="mt-8 sm:mt-10 animate-fade-in px-2" style={{ animationDelay: '1.5s' }}>
+          {/* GREEN CTA */}
+          <div className="mt-10 animate-fade-in" style={{ animationDelay: '1.5s' }}>
             <Button
               size="lg"
               onClick={() => session ? setMode('create') : navigate("/auth")}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-10 py-5 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl shadow-emerald-600/20 active:scale-95 transition-all w-full sm:w-auto"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-6 rounded-2xl text-lg font-bold shadow-xl shadow-emerald-600/20 active:scale-95 transition-all"
             >
               Get Started Now — It&apos;s Free 🚀
             </Button>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-3 sm:mt-4 font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em] px-2">No credit card • UPI linking • Instant access</p>
+            <p className="text-xs text-muted-foreground mt-4 font-medium uppercase tracking-[0.2em]">No credit card required • Instant access</p>
           </div>
         </div>
 
