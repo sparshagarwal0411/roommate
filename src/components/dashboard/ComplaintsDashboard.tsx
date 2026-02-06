@@ -1,0 +1,60 @@
+
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Member } from "@/hooks/useHostel";
+import { ComplaintsList } from "./ComplaintsList";
+import { LostAndFoundList } from "./LostAndFoundList";
+import { MessageSquare, PackageSearch } from "lucide-react";
+
+interface ComplaintsDashboardProps {
+    hostelId: string;
+    members: Member[];
+    isOwner: boolean;
+    currentMemberId: string | undefined;
+}
+
+export const ComplaintsDashboard = ({ hostelId, members, isOwner, currentMemberId }: ComplaintsDashboardProps) => {
+    return (
+        <div className="space-y-6 animate-fade-in">
+            <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-2xl border border-primary/10">
+                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                    RoomMate Support Center 🛠️
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                    Raise complaints, track maintenance, or post lost & found items.
+                </p>
+            </div>
+
+            <Tabs defaultValue="maintenance" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
+                    <TabsTrigger value="maintenance" className="gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        Complaints
+                    </TabsTrigger>
+                    <TabsTrigger value="lostfound" className="gap-2">
+                        <PackageSearch className="h-4 w-4" />
+                        Lost & Found
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="maintenance" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                    <ComplaintsList
+                        hostelId={hostelId}
+                        members={members}
+                        isOwner={isOwner}
+                        currentMemberId={currentMemberId}
+                    />
+                </TabsContent>
+
+                <TabsContent value="lostfound" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                    <LostAndFoundList
+                        hostelId={hostelId}
+                        members={members}
+                        isOwner={isOwner}
+                        currentMemberId={currentMemberId}
+                    />
+                </TabsContent>
+            </Tabs>
+        </div>
+    );
+};

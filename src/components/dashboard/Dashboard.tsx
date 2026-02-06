@@ -23,9 +23,9 @@ import { MonthlyHistory } from "./MonthlyHistory";
 import { NotificationBell } from "./NotificationBell";
 import { NotificationPopup } from "./NotificationPopup";
 import { BroadcastDialog } from "./BroadcastDialog";
-import { MonthlySummary, MonthlySummaryButton } from "./MonthlySummary";
 import { AISpendingAdvisor } from "./AISpendingAdvisor";
 import { EchoVoiceAssistant } from "./EchoVoiceAssistant";
+import { ComplaintsDashboard } from "./ComplaintsDashboard";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import {
@@ -78,7 +78,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const resetBalances = useResetBalances();
 
-  const [viewMode, setViewMode] = useState<"current" | "history">("current");
+  const [viewMode, setViewMode] = useState<"current" | "history" | "complaints">("current");
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [alertedThresholds, setAlertedThresholds] = useState<{ [key: string]: Set<number> }>(
     () => ({
@@ -376,6 +376,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
               <TabsList className="bg-muted/50">
                 <TabsTrigger value="current" className="text-xs">Dashboard</TabsTrigger>
                 <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
+                <TabsTrigger value="complaints" className="text-xs">Complaints</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -530,15 +531,15 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
 
 
           </>
-        )}
+        ) : viewMode === "complaints" ? (
+        <ComplaintsDashboard
+          hostelId={hostelId}
+          members={members}
+          isOwner={isOwner}
+          currentMemberId={me?.id}
+        />
+        ) : null}
       </main>
-      <AISpendingAdvisor
-        hostel={hostel!}
-        expenses={filteredExpenses}
-        members={members}
-        currentMemberId={me?.id}
-        totalSpent={totalSpent}
-      />
       <ScrollToTop />
       <EchoVoiceAssistant members={members} hostelId={hostelId} />
       <Footer />

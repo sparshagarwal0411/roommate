@@ -86,6 +86,31 @@ export interface RecurringBill {
   updated_at: string | null;
 }
 
+export interface Complaint {
+  id: string;
+  hostel_id: string;
+  member_id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'resolving' | 'resolved';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LostAndFound {
+  id: string;
+  hostel_id: string;
+  member_id: string;
+  title: string;
+  description: string;
+  type: 'lost' | 'found';
+  status: 'open' | 'closed';
+  contact_info: string | null;
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Fetch hostel by ID
 export const useHostel = (hostelId: string | null) => {
   return useQuery({
@@ -878,6 +903,120 @@ export const useGenerateMonthlyBills = () => {
     },
     onSuccess: (_, hostelId) => {
       queryClient.invalidateQueries({ queryKey: ['utility_bills', hostelId] });
+    },
+  });
+};
+
+// Fetch complaints
+export const useComplaints = (hostelId: string | null) => {
+  return useQuery({
+    queryKey: ['complaints', hostelId],
+    queryFn: async () => {
+      if (!hostelId) return [];
+      const { data, error } = await supabase
+        .from('complaints')
+        .select('*')
+        .eq('hostel_id', hostelId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as Complaint[];
+    },
+    enabled: !!hostelId,
+  });
+};
+
+// Add complaint
+export const useAddComplaint = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (complaint: Omit<Complaint, 'id' | 'created_at' | 'updated_at' | 'status'>) => {
+      const { data, error } = await supabase
+        .from('complaints')
+        .insert(complaint)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Complaint;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['complaints', variables.hostel_id] });
+    },
+  });
+};
+
+// Update complaint status
+export const useUpdateComplaintStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ complaintId, status, hostelId }: { complaintId: string; status: Complaint['status']; hostelId: string }) => {
+      const { data, error } = await supabase
+        .from('complaints')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', complaintId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Complaint;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['complaints', variables.hostelId] });
+    },
+  });
+};
+
+// Fetch Lost and Found items
+export const useLostAndFound = (hostelId: string | null) => {
+  return useQuery({
+    queryKey: ['lost_found', hostelId],
+    queryFn: async () => {
+      if (!hostelId) return [];
+      const { data, error } = await supabase
+        .from('lost_found')
+        .select('*')
+        .eq('hostel_id', hostelId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as LostAndFound[];
+    },
+    enabled: !!hostelId,
+  });
+};
+
+// Add Lost and Found item
+export const useAddLostAndFound = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (item: Omit<LostAndFound, 'id' | 'created_at' | 'updated_at' | 'status'>) => {
+      const { data, error } = await supabase
+        .from('lost_found')
+        .insert(item)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as LostAndFound;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lost_found', variables.hostel_id] });
+    },
+  });
+};
+
+// Update Lost and Found status
+export const useUpdateLostAndFoundStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ itemId, status, hostelId }: { itemId: string; status: LostAndFound['status']; hostelId: string }) => {
+      const { data, error } = await supabase
+        .from('lost_found')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', itemId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as LostAndFound;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lost_found', variables.hostelId] });
     },
   });
 };
