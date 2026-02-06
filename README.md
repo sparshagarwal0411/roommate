@@ -72,59 +72,37 @@ Scenario: Groceries Purchase
 - **Selective Bill Splitting**: Choose to split expenses equally across all members or with specific roommates
 - **Income Tracking**: Record extra funds, refunds, and contributions to adjust the monthly budget
 - **Automatic Calculations**: Instantly see who owes whom with real-time balance updates
+- **UPI QR Integration**: Personalize your profile with UPI ID and QR codes for seamless debt settlement
 
-### 🏘️ Hostel & Room Management
-- **Create or Join Hostels**: Generate unique 6-digit codes to invite roommates or join existing hostels
-- **Room Assignment**: Track individual room numbers and member assignments
-- **Member Management**: Add, remove, or manage roommate information
-- **Hostel Ownership**: Manage hostel settings and member permissions
+### 📊 Financial Insights & Visualization
+- **Spending Heatmap**: Interactive daily spending visualization with global relative scaling for accurate financial perspective
+- **Balance Summary**: Visual "Who Owes Whom" overview with status indicators and quick-pay actions
+- **Spending Charts**: Analyze expense categories and trends with interactive Recharts visualizations
+- **Budget Monitoring**: Real-time warnings and visual status (🟢, 🟡, 🔴) when approaching monthly limits
+- **Utility Management**: Specialized tracking for WiFi, Rent, and Electricity with room-specific splitting
 
-### 📊 Financial Insights
-- **Balance Summary**: Visual "Who Owes Whom" overview with red/green status indicators
-- **Spending Charts**: Analyze expense trends and category breakdowns
-- **Budget Alerts**: Real-time warnings when approaching or exceeding monthly limits
-- **Recurring Bills**: Automate monthly expenses like WiFi, Rent, and Electricity
-- **Monthly History**: Review past months' transactions and settlements
-- **Settlement Tracking**: Mark debts as paid with persistent transaction history
+### 🛠️ Maintenance & Hostel Operations
+- **Maintenance Tracker**: Dedicated system for reporting hostel issues with status tracking (Pending → Resolving → Resolved)
+- **Mess Management**: Weekly menu dashboard for tracking breakfast, lunch, and dinner schedules
+- **Announcements System**: Broadcast urgent hostel updates to all members with high-visibility alerts
+- **Lost & Found**: Centralized portal for posting and tracking misplaced items within the hostel
 
 ### 🤖 Smart AI Assistance
 - **Roomie AI Advisor**: Personalized budget advice and spending analysis
-- **Gemini Powered**: Leveraging Google's Gemini-2.5-flash for intelligent insights
-- **Interactive Chat**: Ask questions about your spending patterns and get saving tips
-- **Visual Status**: Instant feedback on your hostel's financial health (🟢, 🟡, 🔴)
-
-### 🔔 Collaboration & Communication
-- **Real-time Notifications**: Get instant alerts for new expenses, settlements, and reminders
-- **Broadcast Messaging**: Send messages to all roommates directly from the dashboard
-- **Activity Feed**: Stay updated on all hostel activities
-- **Settlement Updates**: Receive notifications when debts are marked as paid
-
-### 🎨 User Experience
-- **Room-Centric Dashboard**: Room numbers and specific roommates prioritized for quick identification
-- **Personalized Greeting**: Dynamic welcome message with your name and room information
-- **Dark/Light Mode**: Theme toggle for comfortable viewing in any lighting
-- **Responsive Design**: Seamless experience on desktop and mobile devices
-- **Intuitive Navigation**: Clean UI built with shadcn/ui components
-
-### 🔐 User Control
-- **Exit Room**: Leave a room independently while remaining in the hostel
-- **Leave Hostel**: Completely exit a hostel with one click
-- **Multi-Hostel Support**: Join multiple hostels simultaneously
+- **Gemini Powered**: Leveraging Google's Gemini Flash for intelligent hostel life insights
+- **Interactive Chat**: Ask questions about your spending patterns and get practical saving tips
 
 ---
 
 ## 🚀 Recent Updates
 
+- **Interactive Spending Heatmap**: Relative daily spending intensity across all recorded history
+- **Unified Support Center**: Combined Maintenance Tracker and Lost & Found portal
+- **Mess Menu Dashboard**: Weekly meal scheduling system for hostel owners and members
+- **Personalized Payments**: UPI ID and QR code integration for faster settlements
+- **Broadcast System**: High-priority announcements for critical hostel communications
 - **AI Advisor Integration**: Smart budget assistant powered by Google Gemini
-- **Automated Recurring Bills**: Monthly automation for fixed expenses
-- **Enhanced Financial Tracking**: Income tracking and selective expense splitting
-- **Budget Alert System**: Visual warnings for over-budget scenarios
-- **Settlement System**: Mark debts as received with historical tracking
-- **Visual Indicators**: Red/green color coding for pending vs settled transactions
-- **Personalized Dashboard**: Welcome section with user and room information
-- **Broadcast Communications**: Send announcements to all roommates
-- **Exit/Leave Controls**: Dedicated buttons for room and hostel management
-- **Notification System**: Real-time alerts powered by Supabase subscriptions
+- **Automated Recurring Bills**: Monthly automation for fixed expenses like WiFi and Rent
 
 ---
 
