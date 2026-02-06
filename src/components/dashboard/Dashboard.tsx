@@ -304,7 +304,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
                 {isEditingName ? (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-wrap">
                     <Input
                       value={editedName}
                       onChange={(e) => setEditedName(e.target.value)}
@@ -312,12 +312,14 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
                       autoFocus
                       onKeyDown={(e) => e.key === "Enter" && handleUpdateName()}
                     />
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-success" onClick={handleUpdateName}>
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setIsEditingName(false)}>
-                      <X className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-success" onClick={handleUpdateName}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setIsEditingName(false)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <>

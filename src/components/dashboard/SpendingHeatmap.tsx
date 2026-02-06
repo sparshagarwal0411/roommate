@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 interface SpendingHeatmapProps {
     month: string; // YYYY-MM
     expenses: Expense[];
+    maxSpending?: number;
 }
 
-export const SpendingHeatmap = ({ month, expenses }: SpendingHeatmapProps) => {
+export const SpendingHeatmap = ({ month, expenses, maxSpending: propsMaxSpending }: SpendingHeatmapProps) => {
     const monthDate = parseISO(`${month}-01`);
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
@@ -22,7 +23,7 @@ export const SpendingHeatmap = ({ month, expenses }: SpendingHeatmapProps) => {
         dailyTotals[dStr] = (dailyTotals[dStr] || 0) + Number(e.amount);
     });
 
-    const maxSpending = Math.max(...Object.values(dailyTotals), 1);
+    const maxSpending = propsMaxSpending || Math.max(...Object.values(dailyTotals), 1);
 
     // Padding for the start of the week (0 = Sunday)
     const firstDayOfWeek = getDay(monthStart);
@@ -37,7 +38,7 @@ export const SpendingHeatmap = ({ month, expenses }: SpendingHeatmapProps) => {
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-muted/50 rounded-full">
                     <div className="w-2 h-2 rounded-full bg-primary/30" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Intensity</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Global Max: ₹{maxSpending.toLocaleString()}</span>
                 </div>
             </div>
 
@@ -58,8 +59,8 @@ export const SpendingHeatmap = ({ month, expenses }: SpendingHeatmapProps) => {
                     const total = dailyTotals[dStr] || 0;
                     const ratio = total / maxSpending;
 
-                    // Radius between 6px and full size (approx 36px in a 40px cell)
-                    const radius = total > 0 ? Math.max(12, ratio * 40) : 0;
+                    // Scale from 30% to 100% of the cell size for non-zero spending
+                    const scale = total > 0 ? 30 + (ratio * 70) : 0;
 
                     return (
                         <TooltipProvider key={dStr}>
@@ -79,9 +80,9 @@ export const SpendingHeatmap = ({ month, expenses }: SpendingHeatmapProps) => {
                                             <div
                                                 className="absolute rounded-full bg-primary shadow-lg transition-all duration-700 ease-out group-hover:scale-110 group-hover:shadow-primary/20"
                                                 style={{
-                                                    width: `${Math.min(radius, 100)}%`,
-                                                    height: `${Math.min(radius, 100)}%`,
-                                                    opacity: 0.15 + (ratio * 0.7),
+                                                    width: `${Math.min(scale, 100)}%`,
+                                                    height: `${Math.min(scale, 100)}%`,
+                                                    opacity: 0.15 + (ratio * 0.75),
                                                     background: `radial-gradient(circle at 30% 30%, hsl(var(--primary)), hsl(var(--primary) / 0.8))`
                                                 }}
                                             />

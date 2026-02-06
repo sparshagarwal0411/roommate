@@ -464,29 +464,19 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
                         )}
 
                         {recipient?.upi_qr_url && (
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" className="w-full flex items-center justify-center gap-2 h-10">
-                                <QrCode className="h-4 w-4" />
-                                Show QR Code
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[300px] flex flex-col items-center justify-center pt-8">
-                              <DialogHeader className="text-center w-full">
-                                <DialogTitle>Scan to Pay {recipient.name}</DialogTitle>
-                              </DialogHeader>
-                              <div className="mt-4 p-4 bg-white rounded-2xl shadow-inner inline-block">
-                                <img
-                                  src={recipient.upi_qr_url}
-                                  alt="UPI QR"
-                                  className="w-48 h-48 object-contain rounded-lg"
-                                />
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-4 text-center">
-                                Use any UPI app like GPay, PhonePe, or Paytm to scan and pay.
-                              </p>
-                            </DialogContent>
-                          </Dialog>
+                          <div className="space-y-3 pt-2">
+                            <div className="flex items-center justify-between">
+                              <p className="text-[10px] text-muted-foreground uppercase font-bold">Quick Scan</p>
+                              <span className="text-[10px] text-primary/60 font-medium">Scan with any UPI App</span>
+                            </div>
+                            <div className="flex justify-center p-3 bg-white rounded-2xl shadow-inner border border-primary/5">
+                              <img
+                                src={recipient.upi_qr_url}
+                                alt="UPI QR"
+                                className="w-40 h-40 object-contain rounded-lg"
+                              />
+                            </div>
+                          </div>
                         )}
                       </div>
                     )}

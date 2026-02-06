@@ -113,36 +113,54 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
                             Report Issue
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle className="text-xl font-bold">New Complaint</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Title</label>
-                                <Input
-                                    placeholder="e.g., Water leakage in bathroom"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
-                                    className="h-11 border-primary/20 focus:border-primary"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Description</label>
-                                <Textarea
-                                    placeholder="Explain the problem clearly..."
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    required
-                                    rows={4}
-                                    className="border-primary/20 focus:border-primary resize-none"
-                                />
-                            </div>
-                            <Button type="submit" className="w-full h-11 text-lg font-bold" disabled={addComplaint.isPending}>
-                                {addComplaint.isPending ? "Submitting..." : "Send Report"}
-                            </Button>
-                        </form>
+                    <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none shadow-2xl rounded-[2rem]">
+                        <div className="bg-gradient-to-br from-primary/10 via-accent/5 to-transparent p-8">
+                            <DialogHeader>
+                                <div className="p-3 bg-primary w-fit rounded-2xl text-white shadow-lg shadow-primary/20 mb-4">
+                                    <MessageSquare className="h-6 w-6" />
+                                </div>
+                                <DialogTitle className="text-2xl font-black tracking-tight">Report New Issue</DialogTitle>
+                                <DialogDescription className="text-muted-foreground/80 font-medium">
+                                    Help us maintain the hostel by reporting issues as soon as you spot them.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Issue Title</label>
+                                    <Input
+                                        placeholder="e.g., Water leakage in Room 302"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        required
+                                        className="h-12 border-primary/20 focus:border-primary bg-background/50 backdrop-blur-sm rounded-xl"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Description</label>
+                                    <Textarea
+                                        placeholder="Please provide details like location, severity, and when you first noticed it..."
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        required
+                                        rows={4}
+                                        className="border-primary/20 focus:border-primary bg-background/50 backdrop-blur-sm rounded-xl resize-none p-4"
+                                    />
+                                </div>
+                                <Button
+                                    type="submit"
+                                    className="w-full h-14 text-lg font-black bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 rounded-2xl group transition-all"
+                                    disabled={addComplaint.isPending}
+                                >
+                                    {addComplaint.isPending ? (
+                                        "Broadcasting..."
+                                    ) : (
+                                        <span className="flex items-center gap-2">
+                                            Submit Report <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform" />
+                                        </span>
+                                    )}
+                                </Button>
+                            </form>
+                        </div>
                     </DialogContent>
                 </Dialog>
             </CardHeader>

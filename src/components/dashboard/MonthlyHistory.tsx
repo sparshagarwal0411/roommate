@@ -117,6 +117,28 @@ export const MonthlyHistory = ({
         return Object.values(data).sort((a, b) => b.month.localeCompare(a.month));
     }, [expenses, incomes, utilityBills, members]);
 
+    // Calculate the absolute maximum daily spending across all time for scaling
+    const globalMaxDailyTotal = useMemo(() => {
+        const dailyTotals: Record<string, number> = {};
+
+        // Process expenses
+        expenses.forEach(e => {
+            const dStr = format(parseISO(e.created_at), "yyyy-MM-dd");
+            dailyTotals[dStr] = (dailyTotals[dStr] || 0) + Number(e.amount);
+        });
+
+        // Add paid utility bills (often larger sums)
+        utilityBills.filter(b => b.paid).forEach(b => {
+            // For utility bills, we don't have a specific day, so we treat it as a single "day" in that month for scaling purposes
+            // or better: just use the month string as a "key" to represent a big hit in that month
+            const mStr = b.month + "-01";
+            dailyTotals[mStr] = (dailyTotals[mStr] || 0) + Number(b.amount);
+        });
+
+        const totals = Object.values(dailyTotals);
+        return totals.length > 0 ? Math.max(...totals) : 1;
+    }, [expenses, utilityBills]);
+
     const currentMonthStr = format(new Date(), "yyyy-MM");
 
     return (
@@ -281,12 +303,14 @@ export const MonthlyHistory = ({
                     <SpendingHeatmap
                         month={currentMonthStr}
                         expenses={expenses.filter(e => format(parseISO(e.created_at), "yyyy-MM") === currentMonthStr)}
+                        maxSpending={globalMaxDailyTotal}
                     />
                     {monthlyData.filter(d => d.month !== currentMonthStr).map((data) => (
                         <SpendingHeatmap
                             key={data.month}
                             month={data.month}
                             expenses={expenses.filter(e => format(parseISO(e.created_at), "yyyy-MM") === data.month)}
+                            maxSpending={globalMaxDailyTotal}
                         />
                     ))}
                 </div>

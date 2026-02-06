@@ -8,6 +8,14 @@ import { useMessMenu, useUpdateMessMenu, MessMenu } from "@/hooks/useHostel";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 interface MessDashboardProps {
@@ -118,50 +126,51 @@ export const MessDashboard = ({ hostelId, isOwner }: MessDashboardProps) => {
                 })}
             </div>
 
-            {editingDay !== null && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <Card className="w-full max-w-md shadow-2xl border-orange-500/20">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Calendar className="h-5 w-5 text-orange-500" />
-                                Update Menu for {DAYS[editingDay]}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold flex items-center gap-2"><Coffee className="h-4 w-4" /> Breakfast</label>
-                                <Input
-                                    placeholder="What's for breakfast?"
-                                    value={editForm.breakfast || ""}
-                                    onChange={e => setEditForm(prev => ({ ...prev, breakfast: e.target.value }))}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold flex items-center gap-2"><Utensils className="h-4 w-4" /> Lunch</label>
-                                <Input
-                                    placeholder="Special lunch items?"
-                                    value={editForm.lunch || ""}
-                                    onChange={e => setEditForm(prev => ({ ...prev, lunch: e.target.value }))}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold flex items-center gap-2"><Moon className="h-4 w-4" /> Dinner</label>
-                                <Input
-                                    placeholder="Dinner menu..."
-                                    value={editForm.dinner || ""}
-                                    onChange={e => setEditForm(prev => ({ ...prev, dinner: e.target.value }))}
-                                />
-                            </div>
-                            <div className="flex gap-3 pt-4">
-                                <Button variant="outline" className="flex-1" onClick={() => setEditingDay(null)}>Cancel</Button>
-                                <Button className="flex-1 gap-2 bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-500/20" onClick={handleSave}>
-                                    <Save className="h-4 w-4" /> Save Menu
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+            <Dialog open={editingDay !== null} onOpenChange={(open) => !open && setEditingDay(null)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Calendar className="h-5 w-5 text-orange-500" />
+                            Update Menu for {editingDay !== null ? DAYS[editingDay] : ""}
+                        </DialogTitle>
+                        <DialogDescription>
+                            Change the meal details for this day of the week.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold flex items-center gap-2"><Coffee className="h-4 w-4" /> Breakfast</label>
+                            <Input
+                                placeholder="What's for breakfast?"
+                                value={editForm.breakfast || ""}
+                                onChange={e => setEditForm(prev => ({ ...prev, breakfast: e.target.value }))}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold flex items-center gap-2"><Utensils className="h-4 w-4" /> Lunch</label>
+                            <Input
+                                placeholder="Special lunch items?"
+                                value={editForm.lunch || ""}
+                                onChange={e => setEditForm(prev => ({ ...prev, lunch: e.target.value }))}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold flex items-center gap-2"><Moon className="h-4 w-4" /> Dinner</label>
+                            <Input
+                                placeholder="Dinner menu..."
+                                value={editForm.dinner || ""}
+                                onChange={e => setEditForm(prev => ({ ...prev, dinner: e.target.value }))}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex gap-3 pt-4">
+                        <Button variant="outline" className="flex-1" onClick={() => setEditingDay(null)}>Cancel</Button>
+                        <Button className="flex-1 gap-2 bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-500/20" onClick={handleSave}>
+                            <Save className="h-4 w-4" /> Save Menu
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
