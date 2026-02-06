@@ -27,6 +27,8 @@ import { MonthlySummary, MonthlySummaryButton } from "./MonthlySummary";
 import { AISpendingAdvisor } from "./AISpendingAdvisor";
 import { EchoVoiceAssistant } from "./EchoVoiceAssistant";
 import { ComplaintsDashboard } from "./ComplaintsDashboard";
+import { AnnouncementsList } from "./AnnouncementsList";
+import { MessDashboard } from "./MessDashboard";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import {
@@ -378,6 +380,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
                 <TabsTrigger value="current" className="text-xs">Dashboard</TabsTrigger>
                 <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
                 <TabsTrigger value="complaints" className="text-xs">Complaints</TabsTrigger>
+                <TabsTrigger value="mess" className="text-xs">Mess</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -420,6 +423,8 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
       </header>
 
       <main className="container py-6 space-y-6">
+        <AnnouncementsList hostelId={hostelId} />
+
         {viewMode === "history" ? (
           <MonthlyHistory
             expenses={expenses}
@@ -438,6 +443,11 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
             members={members}
             isOwner={isOwner}
             currentMemberId={me?.id}
+          />
+        ) : viewMode === "mess" ? (
+          <MessDashboard
+            hostelId={hostelId}
+            isOwner={isOwner}
           />
         ) : (
           <>

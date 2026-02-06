@@ -113,6 +113,25 @@ export interface LostAndFound {
   updated_at: string;
 }
 
+export interface Announcement {
+  id: string;
+  hostel_id: string;
+  title: string;
+  content: string;
+  type: 'info' | 'urgent' | 'event';
+  created_at: string;
+}
+
+export interface MessMenu {
+  id: string;
+  hostel_id: string;
+  day_of_week: number; // 0-6
+  breakfast: string | null;
+  lunch: string | null;
+  dinner: string | null;
+  updated_at: string;
+}
+
 // Fetch hostel by ID
 export const useHostel = (hostelId: string | null) => {
   return useQuery({
@@ -1015,7 +1034,6 @@ export const useAddLostAndFound = () => {
     },
   });
 };
-
 // Update Lost and Found status
 export const useUpdateLostAndFoundStatus = () => {
   const queryClient = useQueryClient();
@@ -1032,6 +1050,78 @@ export const useUpdateLostAndFoundStatus = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['lost_found', variables.hostelId] });
+    },
+  });
+};
+
+// Announcement hooks
+export const useAnnouncements = (hostelId: string | null) => {
+  return useQuery({
+    queryKey: ['announcements', hostelId],
+    queryFn: async () => {
+      if (!hostelId) return [];
+      const { data, error } = await supabase
+        .from('announcements' as any)
+        .select('*')
+        .eq('hostel_id', hostelId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data as any[]) as Announcement[];
+    },
+    enabled: !!hostelId,
+  });
+};
+
+export const useAddAnnouncement = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (announcement: Omit<Announcement, 'id' | 'created_at'>) => {
+      const { data, error } = await supabase
+        .from('announcements' as any)
+        .insert(announcement)
+        .select()
+        .single();
+      if (error) throw error;
+      return (data as any) as Announcement;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['announcements', variables.hostel_id] });
+    },
+  });
+};
+
+// Mess Menu hooks
+export const useMessMenu = (hostelId: string | null) => {
+  return useQuery({
+    queryKey: ['mess_menu', hostelId],
+    queryFn: async () => {
+      if (!hostelId) return [];
+      const { data, error } = await supabase
+        .from('mess_menu' as any)
+        .select('*')
+        .eq('hostel_id', hostelId)
+        .order('day_of_week', { ascending: true });
+      if (error) throw error;
+      return (data as any[]) as MessMenu[];
+    },
+    enabled: !!hostelId,
+  });
+};
+
+export const useUpdateMessMenu = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (menuItem: Omit<MessMenu, 'id' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from('mess_menu' as any)
+        .upsert(menuItem, { onConflict: 'hostel_id,day_of_week' })
+        .select()
+        .single();
+      if (error) throw error;
+      return (data as any) as MessMenu;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['mess_menu', variables.hostel_id] });
     },
   });
 };

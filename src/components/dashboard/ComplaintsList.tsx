@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { MessageSquare, Plus, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { MessageSquare, Plus, CheckCircle2, Clock, AlertCircle, Megaphone, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,9 +13,17 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Complaint, Member, useComplaints, useAddComplaint, useUpdateComplaintStatus } from "@/hooks/useHostel";
+import {
+    Complaint,
+    Member,
+    useComplaints,
+    useAddComplaint,
+    useUpdateComplaintStatus,
+    useAddAnnouncement
+} from "@/hooks/useHostel";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface ComplaintsProps {
     hostelId: string;
@@ -28,6 +36,7 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
     const { data: complaints = [], isLoading } = useComplaints(hostelId);
     const addComplaint = useAddComplaint();
     const updateStatus = useUpdateComplaintStatus();
+    const addAnnouncement = useAddAnnouncement();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [title, setTitle] = useState("");
@@ -57,71 +66,81 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
         }
     };
 
+    const handlePublishAnnouncement = async (complaint: Complaint) => {
+        try {
+            await addAnnouncement.mutateAsync({
+                hostel_id: hostelId,
+                title: `Broadcast: ${complaint.title}`,
+                content: complaint.description,
+                type: 'urgent'
+            });
+            toast.success("Published as Announcement! 📢");
+        } catch (error) {
+            toast.error("Failed to publish announcement");
+        }
+    };
+
     const getStatusIcon = (status: Complaint['status']) => {
         switch (status) {
-            case 'resolved': return <CheckCircle2 className="h-4 w-4 text-success" />;
-            case 'resolving': return <Clock className="h-4 w-4 text-warning" />;
-            default: return <AlertCircle className="h-4 w-4 text-destructive" />;
+            case 'resolved': return <CheckCircle2 className="h-5 w-5 text-success animate-in zoom-in" />;
+            case 'resolving': return <Clock className="h-5 w-5 text-warning animate-pulse" />;
+            default: return <AlertCircle className="h-5 w-5 text-destructive" />;
         }
     };
 
-    const getStatusBadge = (status: Complaint['status']) => {
+    const getStatusStyles = (status: Complaint['status']) => {
         switch (status) {
-            case 'resolved': return <Badge variant="outline" className="border-success text-success">Resolved</Badge>;
-            case 'resolving': return <Badge variant="secondary" className="bg-warning/20 text-warning hover:bg-warning/30">Resolving</Badge>;
-            default: return <Badge variant="destructive">Pending</Badge>;
-        }
-    };
-
-    const handleStatusChange = async (complaintId: string, newStatus: Complaint['status']) => {
-        try {
-            await updateStatus.mutateAsync({ complaintId, status: newStatus, hostelId });
-            toast.success(`Status updated to ${newStatus}!`);
-        } catch (error) {
-            toast.error("Failed to update status");
+            case 'resolved': return "bg-success/10 text-success border-success/20";
+            case 'resolving': return "bg-warning/10 text-warning border-warning/20";
+            default: return "bg-destructive/10 text-destructive border-destructive/20";
         }
     };
 
     return (
         <Card className="border-none shadow-none bg-transparent">
-            <CardHeader className="px-0 flex flex-row items-center justify-between">
-                <CardTitle className="text-xl flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                    Maintenance & Complaints
-                </CardTitle>
+            <CardHeader className="px-0 flex flex-row items-center justify-between pb-6">
+                <div>
+                    <CardTitle className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent flex items-center gap-2">
+                        <MessageSquare className="h-7 w-7 text-primary" />
+                        Maintenance Tracker
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground mt-1">Raise issues or track ongoing repairs</p>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button size="sm" className="gap-2">
+                        <Button className="gap-2 bg-primary shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
                             <Plus className="h-4 w-4" />
-                            New Complaint
+                            Report Issue
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                            <DialogTitle>Submit a New Complaint</DialogTitle>
+                            <DialogTitle className="text-xl font-bold">New Complaint</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Issue Title</label>
+                                <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Title</label>
                                 <Input
-                                    placeholder="e.g., Leaking tap, Broken light"
+                                    placeholder="e.g., Water leakage in bathroom"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     required
+                                    className="h-11 border-primary/20 focus:border-primary"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Description</label>
+                                <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Description</label>
                                 <Textarea
-                                    placeholder="Describe the issue in detail..."
+                                    placeholder="Explain the problem clearly..."
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     required
                                     rows={4}
+                                    className="border-primary/20 focus:border-primary resize-none"
                                 />
                             </div>
-                            <Button type="submit" className="w-full" disabled={addComplaint.isPending}>
-                                {addComplaint.isPending ? "Submitting..." : "Submit Complaint"}
+                            <Button type="submit" className="w-full h-11 text-lg font-bold" disabled={addComplaint.isPending}>
+                                {addComplaint.isPending ? "Submitting..." : "Send Report"}
                             </Button>
                         </form>
                     </DialogContent>
@@ -129,11 +148,19 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
             </CardHeader>
             <CardContent className="px-0 space-y-4">
                 {isLoading ? (
-                    <div className="text-center py-8 text-muted-foreground italic">Loading complaints...</div>
+                    <div className="flex flex-col items-center justify-center py-20 gap-3">
+                        <div className="h-10 w-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                        <p className="text-muted-foreground animate-pulse">Loading tickets...</p>
+                    </div>
                 ) : complaints.length === 0 ? (
-                    <div className="text-center py-12 bg-muted/20 rounded-2xl border border-dashed">
-                        <MessageSquare className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-                        <p className="text-muted-foreground">No complaints found. Everything's looking good! ✨</p>
+                    <div className="text-center py-20 bg-muted/20 rounded-3xl border-2 border-dashed border-muted flex flex-col items-center">
+                        <div className="h-20 w-20 bg-muted/30 rounded-full flex items-center justify-center mb-4">
+                            <CheckCircle2 className="h-10 w-10 text-muted-foreground/40" />
+                        </div>
+                        <h3 className="text-xl font-bold text-muted-foreground">No Active Issues</h3>
+                        <p className="text-xs text-muted-foreground/60 max-w-[250px] mx-auto mt-2">
+                            Everything seems to be working perfectly! Hit the plus button to report something.
+                        </p>
                     </div>
                 ) : (
                     <div className="grid gap-4">
@@ -142,61 +169,74 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
                             return (
                                 <div
                                     key={complaint.id}
-                                    className="p-4 rounded-xl border bg-card hover:shadow-md transition-all animate-fade-in"
+                                    className="group relative p-5 rounded-2xl border bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in"
                                 >
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                                        <div className="flex items-center gap-2">
-                                            {getStatusIcon(complaint.status)}
-                                            <h3 className="font-bold text-lg">{complaint.title}</h3>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                                            <div className={cn("p-2.5 rounded-xl shrink-0 mt-0.5", getStatusStyles(complaint.status))}>
+                                                {getStatusIcon(complaint.status)}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h3 className="font-black text-lg tracking-tight truncate">{complaint.title}</h3>
+                                                    <Badge variant="outline" className={cn("text-[8px] h-4 font-bold uppercase tracking-widest", getStatusStyles(complaint.status))}>
+                                                        {complaint.status}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                                                    {complaint.description}
+                                                </p>
+                                            </div>
                                         </div>
+                                        <span className="text-[10px] tabular-nums font-bold text-muted-foreground whitespace-nowrap bg-muted/50 px-2 py-1 rounded-md">
+                                            {format(parseISO(complaint.created_at), "MMM d, h:mm a")}
+                                        </span>
+                                    </div>
+
+                                    <div className="mt-5 pt-4 border-t border-border/40 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            {getStatusBadge(complaint.status)}
-                                            <span className="text-xs text-muted-foreground">
-                                                {format(parseISO(complaint.created_at), "MMM d, h:mm a")}
+                                            <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 text-center">
+                                                {member?.name?.[0] || "?"}
+                                            </div>
+                                            <span className="text-[10px] font-bold text-muted-foreground">
+                                                Reported by {member?.name || "Member"}
                                             </span>
                                         </div>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                                        {complaint.description}
-                                    </p>
-                                    <div className="flex items-center justify-between pt-3 border-t">
-                                        <span className="text-xs font-medium bg-muted px-2 py-1 rounded">
-                                            Reported by: {member?.name || "Unknown"}
-                                        </span>
-                                        {isOwner && (
-                                            <div className="flex items-center gap-1">
-                                                {complaint.status !== 'pending' && (
+
+                                        <div className="flex items-center gap-2">
+                                            {isOwner && (
+                                                <>
                                                     <Button
-                                                        variant="ghost"
+                                                        variant="hero"
                                                         size="sm"
-                                                        className="h-8 text-[10px]"
-                                                        onClick={() => handleStatusChange(complaint.id, 'pending')}
+                                                        className="h-7 text-[10px] font-bold gap-1.5 px-3 rounded-full shadow-lg shadow-primary/20"
+                                                        onClick={() => handlePublishAnnouncement(complaint)}
                                                     >
-                                                        Set Pending
+                                                        <Megaphone className="h-3 w-3" />
+                                                        ANNOUNCE
                                                     </Button>
-                                                )}
-                                                {complaint.status !== 'resolving' && (
+                                                    <div className="h-4 w-[1px] bg-border mx-1" />
                                                     <Button
-                                                        variant="secondary"
-                                                        size="sm"
-                                                        className="h-8 text-[10px]"
-                                                        onClick={() => handleStatusChange(complaint.id, 'resolving')}
+                                                        variant="soft"
+                                                        size="icon"
+                                                        className={cn("h-7 w-7 rounded-full text-success hover:bg-success/20", complaint.status === 'resolved' && "bg-success/20")}
+                                                        onClick={() => updateStatus.mutate({ complaintId: complaint.id, status: 'resolved', hostelId })}
+                                                        title="Resolve"
                                                     >
-                                                        Set Resolving
+                                                        <CheckCircle2 className="h-4 w-4" />
                                                     </Button>
-                                                )}
-                                                {complaint.status !== 'resolved' && (
                                                     <Button
-                                                        variant="success"
-                                                        size="sm"
-                                                        className="h-8 text-[10px]"
-                                                        onClick={() => handleStatusChange(complaint.id, 'resolved')}
+                                                        variant="soft"
+                                                        size="icon"
+                                                        className={cn("h-7 w-7 rounded-full text-warning hover:bg-warning/20", complaint.status === 'resolving' && "bg-warning/20")}
+                                                        onClick={() => updateStatus.mutate({ complaintId: complaint.id, status: 'resolving', hostelId })}
+                                                        title="Resolving"
                                                     >
-                                                        Mark Resolved
+                                                        <Clock className="h-4 w-4" />
                                                     </Button>
-                                                )}
-                                            </div>
-                                        )}
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             );
