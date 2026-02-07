@@ -6,16 +6,18 @@ import { Input } from "@/components/ui/input";
 import { useUpdateBudget, Hostel, Expense } from "@/hooks/useHostel";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Area } from "recharts";
-import { getDaysInMonth, getDate, endOfMonth, format } from "date-fns";
+import { getDaysInMonth, getDate, format, parseISO } from "date-fns";
 
 interface BudgetTrackerProps {
   hostel: Hostel;
   totalSpent: number;
   totalIncome?: number;
   expenses?: Expense[];
+  /** When viewing history, pass yyyy-MM so chart and projection use that month */
+  month?: string;
 }
 
-export const BudgetTracker = ({ hostel, totalSpent, totalIncome = 0, expenses = [] }: BudgetTrackerProps) => {
+export const BudgetTracker = ({ hostel, totalSpent, totalIncome = 0, expenses = [], month }: BudgetTrackerProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newBudget, setNewBudget] = useState(hostel.monthly_budget?.toString() || "0");
   const updateBudget = useUpdateBudget();
@@ -46,15 +48,18 @@ export const BudgetTracker = ({ hostel, totalSpent, totalIncome = 0, expenses = 
     if (budget === 0) return [];
 
     const today = new Date();
-    const daysInMonth = getDaysInMonth(today);
-    const currentDay = getDate(today);
+    const currentMonthStr = format(today, "yyyy-MM");
+    const isViewingPastMonth = !!month && month !== currentMonthStr;
 
-    // 1. Group expenses by day
+    const monthDate = month ? parseISO(month + "-01") : today;
+    const daysInMonth = getDaysInMonth(monthDate);
+    const currentDay = isViewingPastMonth ? daysInMonth : getDate(today);
+
+    // 1. Group expenses by day (expenses are already for the correct month from parent)
     const dailySpend: Record<number, number> = {};
     expenses.forEach(e => {
       const date = new Date(e.created_at);
       const day = getDate(date);
-      // Only count if it's this month (filteredExpenses passed from parent guarantees month, but let's be safe if logic changes)
       dailySpend[day] = (dailySpend[day] || 0) + Number(e.amount);
     });
 
@@ -62,46 +67,46 @@ export const BudgetTracker = ({ hostel, totalSpent, totalIncome = 0, expenses = 
     let runningTotal = 0;
     const data = [];
 
-    // Calculate average daily burn rate based on PAST days (including today)
-    // To avoid huge spikes on day 1 projecting nicely, maybe average over active days? 
-    // Simple approach: Total Spent / Current Day Number
     const dailyBurnRate = totalSpent / Math.max(currentDay, 1);
 
     for (let day = 1; day <= daysInMonth; day++) {
       const isPastOrToday = day <= currentDay;
 
       if (isPastOrToday) {
-        // Actual Data
         const spendToday = dailySpend[day] || 0;
         runningTotal += spendToday;
         data.push({
           day,
           actual: runningTotal,
-          projected: null, // Don't show projection on past days to keep it clean, or show dashed line? User asked "Projected" in different color.
+          projected: null,
           limit: budget
         });
       } else {
-        // Future Projection
-        // Project from the LAST KNOWN total
-        const projectedTotal = runningTotal + (dailyBurnRate * (day - currentDay));
-        data.push({
-          day,
-          actual: null,
-          projected: projectedTotal,
-          limit: budget
-        });
+        if (isViewingPastMonth) {
+          data.push({ day, actual: runningTotal, projected: null, limit: budget });
+        } else {
+          const projectedTotal = runningTotal + (dailyBurnRate * (day - currentDay));
+          data.push({
+            day,
+            actual: null,
+            projected: projectedTotal,
+            limit: budget
+          });
+        }
       }
     }
 
-    // Connect the lines: make the first projected point start at the last actual point
-    if (data[currentDay - 1] && data[currentDay]) {
-      data[currentDay].projected = data[currentDay - 1].actual; // Start projection from current actual
+    if (!isViewingPastMonth && data[currentDay - 1] && data[currentDay]) {
+      data[currentDay].projected = data[currentDay - 1].actual;
     }
 
     return data;
-  }, [expenses, totalSpent, budget]);
+  }, [expenses, totalSpent, budget, month]);
 
-  const projectedEndTotal = chartData.length > 0 ? chartData[chartData.length - 1].projected : 0;
+  const currentMonthStr = format(new Date(), "yyyy-MM");
+  const isViewingPastMonth = !!month && month !== currentMonthStr;
+  const lastPoint = chartData.length > 0 ? chartData[chartData.length - 1] : null;
+  const projectedEndTotal = lastPoint ? (lastPoint.projected ?? lastPoint.actual) : 0;
   const isOverBudgetJson = (projectedEndTotal || 0) > budget;
 
 
@@ -213,10 +218,10 @@ export const BudgetTracker = ({ hostel, totalSpent, totalIncome = 0, expenses = 
                 <div className="h-32 mt-4 pt-4 border-t border-border/50">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-semibold flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" /> Projection
+                      <TrendingUp className="h-3 w-3" /> {isViewingPastMonth ? "Spending" : "Projection"}
                     </p>
                     <p className={`text-xs ${isOverBudgetJson ? "text-destructive" : "text-success"}`}>
-                      Est. End: ₹{projectedEndTotal?.toFixed(0) || "0"}
+                      {isViewingPastMonth ? "Total" : "Est. End"}: ₹{projectedEndTotal?.toFixed(0) || "0"}
                     </p>
                   </div>
                   <ResponsiveContainer width="100%" height="100%">

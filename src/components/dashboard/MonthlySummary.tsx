@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Settlement {
   from: Member;
@@ -531,16 +530,16 @@ export function MonthlySummaryButton({ expenses, members, month }: MonthlySummar
           Monthly Summary
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col gap-4">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Monthly Summary Report</DialogTitle>
           <DialogDescription>
             {format(parseISO(month + "-01"), "MMMM yyyy")} • Generated {format(new Date(), "MMM d, yyyy")}
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pr-2 -mr-2">
+          <div className="space-y-4 pr-4">
             {/* Summary Stats */}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-primary/10 p-3 rounded-lg text-center">
@@ -638,7 +637,7 @@ export function MonthlySummaryButton({ expenses, members, month }: MonthlySummar
               Export as PDF
             </Button>
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

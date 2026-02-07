@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { Search, Plus, MapPin, Phone, CheckCircle, PackageSearch, Tag, Info, Megaphone } from "lucide-react";
+import { Search, Plus, Phone, CheckCircle, PackageSearch, Megaphone, Camera, Loader2, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,6 +54,30 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
     const [type, setType] = useState<'lost' | 'found'>('lost');
     const [contactInfo, setContactInfo] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !file.type.startsWith("image/")) {
+            toast.error("Please select an image file (JPG, PNG, etc.)");
+            return;
+        }
+        setIsUploading(true);
+        try {
+            const fileName = `lost-found/${hostelId}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+            const { error } = await supabase.storage.from("receipts").upload(fileName, file);
+            if (error) throw error;
+            const { data: { publicUrl } } = supabase.storage.from("receipts").getPublicUrl(fileName);
+            setImageUrl(publicUrl);
+            toast.success("Photo attached! 📷");
+        } catch (err: any) {
+            toast.error(err.message || "Failed to upload image");
+        } finally {
+            setIsUploading(false);
+            e.target.value = "";
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,13 +94,14 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
                 title: title.trim(),
                 description: description.trim(),
                 type,
-                contact_info: contactInfo.trim(),
-                image_url: null,
+                contact_info: contactInfo.trim() || null,
+                image_url: imageUrl,
             });
             toast.success(`${type === 'lost' ? 'Lost' : 'Found'} item posted! 🔍`);
             setTitle("");
             setDescription("");
             setContactInfo("");
+            setImageUrl(null);
             setIsDialogOpen(false);
         } catch (error) {
             toast.error("Failed to post item");
@@ -158,7 +184,7 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setImageUrl(null); }}>
                         <DialogTrigger asChild>
                             <Button className="h-10 px-5 gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 rounded-xl font-bold">
                                 <Plus className="h-4 w-4" />
@@ -214,6 +240,36 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
                                         className="h-11 rounded-xl"
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black uppercase text-muted-foreground">Photo (optional)</label>
+                                    <div className="flex items-center gap-3">
+                                        <label className="flex-1 cursor-pointer">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleImageUpload}
+                                                disabled={isUploading}
+                                            />
+                                            <div className="flex items-center justify-center gap-2 h-11 rounded-xl border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-foreground">
+                                                {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                                                <span className="text-sm font-medium">{isUploading ? "Uploading..." : "Attach a photo"}</span>
+                                            </div>
+                                        </label>
+                                        {imageUrl && (
+                                            <div className="relative shrink-0">
+                                                <img src={imageUrl} alt="Attached" className="h-11 w-11 rounded-lg object-cover border border-border" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setImageUrl(null)}
+                                                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                                                >
+                                                    <X className="h-2.5 w-2.5" />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                                 <Button type="submit" className="w-full h-11 text-lg font-bold bg-blue-600 hover:bg-blue-700 mt-2" disabled={addItem.isPending}>
                                     {addItem.isPending ? "Posting..." : "Share on Board"}
                                 </Button>
@@ -266,6 +322,21 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
                                             </span>
                                         </div>
                                     </div>
+
+                                    {item.image_url && (
+                                        <a
+                                            href={item.image_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block mb-4 rounded-xl overflow-hidden border border-border/50 bg-muted/30 aspect-video max-h-48 w-full"
+                                        >
+                                            <img
+                                                src={item.image_url}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-200"
+                                            />
+                                        </a>
+                                    )}
 
                                     <h3 className="text-xl font-black mb-2 leading-tight group-hover:text-primary transition-colors">{item.title}</h3>
                                     <p className="text-sm text-muted-foreground mb-6 leading-relaxed flex-grow">
