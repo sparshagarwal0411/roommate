@@ -1126,3 +1126,24 @@ export const useUpdateMessMenu = () => {
     },
   });
 };
+
+// Clear all settlements mutation (for admins to clear all dues)
+export const useClearAllSettlements = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (hostelId: string) => {
+      const { error } = await supabase
+        .from('settlements')
+        .delete()
+        .eq('hostel_id', hostelId);
+
+      if (error) throw error;
+      return hostelId;
+    },
+    onSuccess: (hostelId) => {
+      queryClient.invalidateQueries({ queryKey: ['settlements', hostelId] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', hostelId] });
+    },
+  });
+};

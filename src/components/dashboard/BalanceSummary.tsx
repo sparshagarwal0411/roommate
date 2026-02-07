@@ -1,7 +1,7 @@
 import { ArrowRight, AlertCircle, CheckCircle2, MessageCircle, CheckCircle, Loader2, Bell, Wallet, Copy, QrCode } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Member, Expense, Settlement as SettlementType, useAddSettlement, useAddNotification, useHostel } from "@/hooks/useHostel";
+import { Member, Expense, Settlement as SettlementType, useAddSettlement, useAddNotification, useHostel, useClearAllSettlements } from "@/hooks/useHostel";
 import { useState } from "react";
 import {
   Dialog,
@@ -62,6 +62,7 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
   const [customMessage, setCustomMessage] = useState("");
   const addSettlement = useAddSettlement();
   const addNotification = useAddNotification();
+  const clearAllSettlements = useClearAllSettlements();
   const { data: hostel } = useHostel(members[0]?.hostel_id || null);
 
   // Calculate balances
@@ -260,6 +261,21 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
     setSelectedSettlement(null);
   };
 
+  const handleClearAllDues = async () => {
+    const hostelId = members[0]?.hostel_id;
+    if (!hostelId || !isOwner) return;
+
+    if (!confirm("⚠️ This will clear ALL dues and settlements. Everyone will start fresh with zero balance. Are you sure?")) return;
+
+    try {
+      await clearAllSettlements.mutateAsync(hostelId);
+      toast.success("All dues cleared! Everyone starts fresh. 🧹✨");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to clear dues. Try again.");
+    }
+  };
+
   if (expenses.length === 0 || members.length === 0) {
     return (
       <Card variant="success">
@@ -276,10 +292,26 @@ export const BalanceSummary = ({ members, expenses, settlements, currentMemberId
     <div className="space-y-6">
       <Card variant="default">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-warning" />
-            Who Owes Whom
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-warning" />
+              Who Owes Whom
+            </CardTitle>
+            {isOwner && pendingSettlements.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-7 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20"
+                onClick={handleClearAllDues}
+                disabled={clearAllSettlements.isPending}
+              >
+                {clearAllSettlements.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                ) : null}
+                Clear All
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {pendingSettlements.length === 0 ? (
