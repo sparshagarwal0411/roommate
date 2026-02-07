@@ -39,6 +39,7 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
     const addComplaint = useAddComplaint();
     const updateStatus = useUpdateComplaintStatus();
     const addAnnouncement = useAddAnnouncement();
+    const addNotification = useAddNotification();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [title, setTitle] = useState("");
@@ -108,6 +109,24 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
             case 'resolved': return "bg-success/10 text-success border-success/20";
             case 'resolving': return "bg-warning/10 text-warning border-warning/20";
             default: return "bg-destructive/10 text-destructive border-destructive/20";
+        }
+    };
+
+    const handleResolveComplaint = async (complaint: Complaint) => {
+        if (complaint.status === 'resolved') return;
+        try {
+            await updateStatus.mutateAsync({ complaintId: complaint.id, status: 'resolved', hostelId });
+            const resolverName = members.find(m => m.id === currentMemberId)?.name || "Admin";
+            await addNotification.mutateAsync({
+                hostel_id: hostelId,
+                recipient_id: complaint.member_id,
+                sender_id: currentMemberId!,
+                actor_name: resolverName,
+                type: 'reminder',
+                content: `Your complaint "${complaint.title}" has been resolved. ✓`,
+            });
+        } catch (error) {
+            toast.error("Failed to update status");
         }
     };
 
@@ -253,7 +272,7 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
                                                         variant="soft"
                                                         size="icon"
                                                         className={cn("h-7 w-7 rounded-full text-success hover:bg-success/20", complaint.status === 'resolved' && "bg-success/20")}
-                                                        onClick={() => updateStatus.mutate({ complaintId: complaint.id, status: 'resolved', hostelId })}
+                                                        onClick={() => handleResolveComplaint(complaint)}
                                                         title="Resolve"
                                                     >
                                                         <CheckCircle2 className="h-4 w-4" />
