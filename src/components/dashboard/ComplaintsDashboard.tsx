@@ -20,12 +20,12 @@ export const ComplaintsDashboard = ({ hostelId, members, isOwner, currentMemberI
     }, [defaultTab]);
 
     return (
-        <div className="space-y-6 animate-fade-in">
-            <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-2xl border border-primary/10">
-                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+        <div className="space-y-6 animate-fade-in overflow-x-hidden min-w-0 w-full">
+            <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-4 sm:p-6 rounded-2xl border border-primary/10">
+                <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent break-words">
                     RoomMate Support Center 🛠️
                 </h2>
-                <p className="text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-sm sm:text-base break-words">
                     Raise complaints, track maintenance, or post lost & found items.
                 </p>
             </div>

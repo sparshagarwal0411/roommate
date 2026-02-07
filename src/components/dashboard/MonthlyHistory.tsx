@@ -120,17 +120,17 @@ export const MonthlyHistory = ({
     const currentMonthStr = format(new Date(), "yyyy-MM");
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold flex items-center gap-2">
-                        <History className="h-6 w-6 text-primary" />
-                        Financial History
+        <div className="space-y-6 overflow-x-hidden min-w-0 w-full">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2 truncate">
+                        <History className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
+                        <span className="truncate">Financial History</span>
                     </h2>
-                    <p className="text-muted-foreground">Relive your past transactions and trends</p>
+                    <p className="text-muted-foreground text-sm truncate">Relive your past transactions and trends</p>
                 </div>
-                <div className="flex gap-2">
-                    <div className="bg-muted/50 p-1 rounded-lg flex gap-1 mr-2">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                    <div className="bg-muted/50 p-1 rounded-lg flex gap-1">
                         <Button
                             variant={viewType === "cards" ? "secondary" : "ghost"}
                             size="sm"
@@ -150,9 +150,10 @@ export const MonthlyHistory = ({
                     </div>
                     <Dialog open={showTrends} onOpenChange={setShowTrends}>
                         <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="gap-2">
-                                <TrendingUp className="h-4 w-4" />
-                                Spending Trends
+                            <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+                                <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                <span className="sm:hidden">Trends</span>
+                                <span className="hidden sm:inline">Spending Trends</span>
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
@@ -168,7 +169,7 @@ export const MonthlyHistory = ({
                         </DialogContent>
                     </Dialog>
                     {selectedMonth && (
-                        <Button variant="outline" size="sm" onClick={() => onSelectMonth(null)} className="h-8">
+                        <Button variant="outline" size="sm" onClick={() => onSelectMonth(null)} className="h-8 shrink-0">
                             Back to Current
                         </Button>
                     )}

@@ -125,7 +125,7 @@ export const AISpendingAdvisor = ({
     };
 
     return (
-        <div className="fixed bottom-6 left-6 z-[100] flex flex-col items-start translate-z-0">
+        <div className="fixed bottom-20 left-4 sm:bottom-6 sm:left-6 z-[100] flex flex-col items-start translate-z-0">
             {/* Chat Window */}
             {isOpen && (
                 <Card className="mb-4 w-[320px] sm:w-[380px] h-[500px] shadow-2xl border border-primary/20 overflow-hidden flex flex-col bg-background/95 backdrop-blur-md animate-in slide-in-from-bottom-5 duration-300">

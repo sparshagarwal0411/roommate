@@ -178,7 +178,7 @@ export const EchoVoiceAssistant = ({ members, hostelId }: EchoVoiceAssistantProp
     }, [isListening]);
 
     return (
-        <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-4 pointer-events-none">
+        <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-[60] flex flex-col items-end gap-4 pointer-events-none">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div

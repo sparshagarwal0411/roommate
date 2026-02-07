@@ -112,12 +112,12 @@ export const ComplaintsList = ({ hostelId, members, isOwner, currentMemberId }: 
     };
 
     return (
-        <Card className="border-none shadow-none bg-transparent">
-            <CardHeader className="px-0 flex flex-row items-center justify-between pb-6">
-                <div>
-                    <CardTitle className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent flex items-center gap-2">
-                        <MessageSquare className="h-7 w-7 text-primary" />
-                        Maintenance Tracker
+        <Card className="border-none shadow-none bg-transparent overflow-hidden min-w-0">
+            <CardHeader className="px-0 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-6">
+                <div className="min-w-0">
+                    <CardTitle className="text-xl sm:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent flex items-center gap-2 flex-wrap">
+                        <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
+                        <span className="break-words">Maintenance Tracker</span>
                     </CardTitle>
                     <p className="text-xs text-muted-foreground mt-1">Raise issues or track ongoing repairs</p>
                 </div>

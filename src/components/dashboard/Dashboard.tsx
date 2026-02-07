@@ -495,7 +495,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
         </div>
       </nav>
 
-      <main className="container py-6 space-y-6">
+      <main className="container py-6 space-y-6 overflow-x-hidden min-w-0">
         <AnnouncementsList hostelId={hostelId} />
 
         {viewMode === "history" ? (
