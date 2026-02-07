@@ -1,10 +1,18 @@
 import { useMemo } from "react";
 import { Megaphone, AlertTriangle, Info, Calendar } from "lucide-react";
-import { useAnnouncements, Announcement } from "@/hooks/useHostel";
+import { useAnnouncements, useLostAndFound, Announcement } from "@/hooks/useHostel";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const DISMISSED_ANNOUNCEMENTS_KEY = "roommate_dismissed_announcements";
+
+function parseLostFoundContent(content: string): { lostFoundId: string; description?: string; contact?: string; title?: string } | null {
+    try {
+        const p = JSON.parse(content) as unknown;
+        if (p && typeof p === "object" && "lostFoundId" in p) return p as { lostFoundId: string; description?: string; contact?: string; title?: string };
+    } catch { /* ignore */ }
+    return null;
+}
 
 interface AnnouncementsListProps {
     hostelId: string;
@@ -12,12 +20,19 @@ interface AnnouncementsListProps {
 
 export const AnnouncementsList = ({ hostelId }: AnnouncementsListProps) => {
     const { data: announcements = [], isLoading } = useAnnouncements(hostelId);
+    const { data: lostFoundItems = [] } = useLostAndFound(hostelId);
 
     const visibleAnnouncements = useMemo(() => {
         if (typeof window === "undefined") return announcements;
         const dismissed: string[] = JSON.parse(localStorage.getItem(DISMISSED_ANNOUNCEMENTS_KEY) || "[]");
-        return announcements.filter((a) => !dismissed.includes(a.id));
-    }, [announcements]);
+        const closedLostFoundIds = new Set(lostFoundItems.filter((i) => i.status === "closed").map((i) => i.id));
+        return announcements.filter((a) => {
+            if (dismissed.includes(a.id)) return false;
+            const lf = parseLostFoundContent(a.content);
+            if (lf && closedLostFoundIds.has(lf.lostFoundId)) return false;
+            return true;
+        });
+    }, [announcements, lostFoundItems]);
 
     if (isLoading) return null;
     if (visibleAnnouncements.length === 0) return null;
@@ -70,7 +85,11 @@ export const AnnouncementsList = ({ hostelId }: AnnouncementsListProps) => {
                                 </div>
                                 <h4 className="font-black text-sm mb-1 leading-tight truncate">{announcement.title}</h4>
                                 <p className="text-[11px] leading-relaxed opacity-80 line-clamp-2">
-                                    {announcement.content}
+                                    {(() => {
+                                        const lf = parseLostFoundContent(announcement.content);
+                                        if (lf) return [lf.description, lf.contact ? `Contact: ${lf.contact}` : null].filter(Boolean).join(" · ");
+                                        return announcement.content;
+                                    })()}
                                 </p>
                             </div>
                         </div>

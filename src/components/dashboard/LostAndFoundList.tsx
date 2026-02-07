@@ -84,14 +84,29 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
 
     const handlePublishAnnouncement = async (item: LostAndFound) => {
         try {
+            const contentPayload = {
+                lostFoundId: item.id,
+                title: item.title,
+                type: item.type,
+                description: item.description,
+                contact: item.contact_info || "Not provided",
+            };
             const ann = await addAnnouncement.mutateAsync({
                 hostel_id: hostelId,
                 title: `${item.type.toUpperCase()}: ${item.title}`,
-                content: `${item.description}\n\nContact: ${item.contact_info || "Not provided"}`,
+                content: JSON.stringify(contentPayload),
                 type: 'info'
             });
             const actorName = members.find(m => m.id === currentMemberId)?.name || "Hostel";
-            const payload = JSON.stringify({ announcementId: ann.id, link: 'lostfound', title: ann.title, content: ann.content });
+            const notificationPayload = {
+                announcementId: ann.id,
+                link: 'lostfound',
+                title: ann.title,
+                lostFoundId: item.id,
+                description: item.description,
+                contact: item.contact_info || "Not provided",
+            };
+            const payloadStr = JSON.stringify(notificationPayload);
             for (const member of members) {
                 if (member.id === currentMemberId) continue;
                 await addNotification.mutateAsync({
@@ -100,7 +115,7 @@ export const LostAndFoundList = ({ hostelId, members, isOwner, currentMemberId }
                     sender_id: currentMemberId!,
                     actor_name: actorName,
                     type: 'broadcast',
-                    content: payload,
+                    content: payloadStr,
                 });
             }
             toast.success("Broadcasted to all roommates! 📢 Notifications sent.");

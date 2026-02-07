@@ -14,18 +14,29 @@ import { useState } from "react";
 
 const DISMISSED_ANNOUNCEMENTS_KEY = "roommate_dismissed_announcements";
 
-function parseAnnouncementPayload(content: string): { announcementId: string; link: string; title: string; content: string } | null {
+type AnnouncementPayload = {
+    announcementId: string;
+    link: string;
+    title: string;
+    content?: string;
+    lostFoundId?: string;
+    description?: string;
+    contact?: string;
+};
+
+function parseAnnouncementPayload(content: string): AnnouncementPayload | null {
     try {
         const p = JSON.parse(content) as unknown;
-        if (p && typeof p === "object" && "announcementId" in p && "link" in p) return p as { announcementId: string; link: string; title: string; content: string };
+        if (p && typeof p === "object" && "announcementId" in p && "link" in p) return p as AnnouncementPayload;
     } catch { /* ignore */ }
     return null;
 }
 
 function getNotificationDisplayContent(n: Notification): string {
     const parsed = parseAnnouncementPayload(n.content);
-    if (parsed) return parsed.title;
-    return n.content;
+    if (!parsed) return n.content;
+    if (parsed.link === "lostfound" && (parsed.description ?? parsed.title)) return parsed.title;
+    return parsed.title;
 }
 
 interface NotificationBellProps {
@@ -170,13 +181,34 @@ export const NotificationBell = ({ memberId, onNavigateTo }: NotificationBellPro
                                 <p className="text-sm leading-relaxed text-foreground">
                                     {(() => {
                                         const parsed = parseAnnouncementPayload(selectedNotification.content);
-                                        if (parsed) return <><span className="font-semibold">{parsed.title}</span><br />{parsed.content}</>;
-                                        return selectedNotification.content;
+                                        if (!parsed) return selectedNotification.content;
+                                        if (parsed.link === "lostfound") {
+                                            return (
+                                                <>
+                                                    <span className="font-semibold">{parsed.title}</span>
+                                                    {(parsed.description || parsed.contact) && (
+                                                        <>
+                                                            <br /><br />
+                                                            {parsed.description && <span className="block">{parsed.description}</span>}
+                                                            {parsed.contact && (
+                                                                <span className="block mt-1 text-muted-foreground text-xs">
+                                                                    Contact: {parsed.contact}
+                                                                </span>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </>
+                                            );
+                                        }
+                                        return <><span className="font-semibold">{parsed.title}</span><br />{parsed.content ?? ""}</>;
                                     })()}
                                 </p>
                                 {parseAnnouncementPayload(selectedNotification.content) && onNavigateTo && (
                                     <Button size="sm" className="gap-2 mt-2" onClick={handleViewAnnouncement}>
-                                        View in Complaints <ArrowRight className="h-4 w-4" />
+                                        {parseAnnouncementPayload(selectedNotification.content)?.link === "lostfound"
+                                            ? "View in Lost & Found"
+                                            : "View in Complaints"}
+                                        <ArrowRight className="h-4 w-4" />
                                     </Button>
                                 )}
                             </div>
