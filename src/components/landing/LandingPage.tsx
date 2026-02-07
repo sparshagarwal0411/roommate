@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HostelDialog } from "@/components/HostelDialog";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { UserMenu } from "@/components/UserMenu";
 import { Footer } from "@/components/Footer";
@@ -206,13 +206,23 @@ interface LandingPageProps {
 export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
   const [session, setSession] = useState<any>(null);
   const [mode, setMode] = useState<'landing' | 'create' | 'join'>('landing');
+  const [joinCodeFromUrl, setJoinCodeFromUrl] = useState('');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
   }, []);
+
+  useEffect(() => {
+    const join = searchParams.get('join');
+    if (join && join.trim().length >= 4) {
+      setJoinCodeFromUrl(join.trim().toUpperCase().slice(0, 6));
+      setMode('join');
+    }
+  }, [searchParams]);
 
   // --- SCROLL LOCK ---
   useEffect(() => {
@@ -791,8 +801,9 @@ export const LandingPage = ({ onHostelJoined }: LandingPageProps) => {
           >
             <HostelDialog
               onHostelJoined={onHostelJoined}
-              onClose={() => setMode('landing')}
+              onClose={() => { setMode('landing'); setJoinCodeFromUrl(''); }}
               initialMode={mode as 'create' | 'join'}
+              initialJoinCode={joinCodeFromUrl}
             />
           </div>
           <div className="absolute inset-0 -z-10" onClick={() => setMode('landing')} />

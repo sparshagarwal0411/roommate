@@ -1,10 +1,16 @@
 import { useState } from "react";
-import { UserPlus, User, Pencil, Check, X } from "lucide-react";
+import { UserPlus, User, Pencil, Check, X, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Member, useAddMember, useRemoveMember, useRemoveRoom, useUpdateMember } from "@/hooks/useHostel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Member, useAddMember, useRemoveMember, useRemoveRoom, useUpdateMember, useUpdateHostel } from "@/hooks/useHostel";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,6 +39,7 @@ export const MembersList = ({ members, hostelId, isOwner, currentProfileId }: Me
   const removeMember = useRemoveMember();
   const removeRoom = useRemoveRoom();
   const updateMember = useUpdateMember();
+  const updateHostel = useUpdateHostel();
 
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [editingRoomValue, setEditingRoomValue] = useState("");
@@ -91,6 +98,20 @@ export const MembersList = ({ members, hostelId, isOwner, currentProfileId }: Me
   const startEditingMember = (memberId: string, currentRoom: string) => {
     setEditingMemberId(memberId);
     setEditingRoomValue(currentRoom);
+  };
+
+  const handleTransferAdmin = async (member: Member) => {
+    if (!member.profile_id) {
+      toast.error("This person hasn't joined with an account yet. They need to sign in first.");
+      return;
+    }
+    if (!confirm(`Transfer admin to ${member.name}? You will no longer be the hostel owner.`)) return;
+    try {
+      await updateHostel.mutateAsync({ hostelId, owner_id: member.profile_id });
+      toast.success(`${member.name} is now the admin! 👑`);
+    } catch (error) {
+      toast.error("Failed to transfer admin.");
+    }
   };
 
   const currentUser = members.find(m => m.profile_id === currentProfileId);
@@ -193,9 +214,29 @@ export const MembersList = ({ members, hostelId, isOwner, currentProfileId }: Me
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium leading-none">
-                        {member.name} {member.profile_id === currentProfileId && "(You)"}
-                      </span>
+                      {isOwner && member.profile_id && member.profile_id !== currentProfileId ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="text-sm font-medium leading-none text-left hover:underline focus:outline-none focus:underline cursor-pointer">
+                              {member.name}
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-48">
+                            <DropdownMenuItem
+                              onClick={() => handleTransferAdmin(member)}
+                              disabled={updateHostel.isPending}
+                              className="gap-2"
+                            >
+                              <ShieldCheck className="h-4 w-4" />
+                              Transfer admin
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <span className="text-sm font-medium leading-none">
+                          {member.name} {member.profile_id === currentProfileId && "(You)"}
+                        </span>
+                      )}
                       {editingMemberId === member.id ? (
                         <div className="flex items-center gap-1 mt-1">
                           <Input

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
 import { ShareButton } from "@/components/ShareButton";
+import { RoomCodeQR } from "@/components/RoomCodeQR";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Footer } from "@/components/Footer";
 import { MembersList } from "./MembersList";
@@ -383,6 +384,10 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Desktop: full actions + tabs */}
             <div className="hidden sm:flex items-center gap-2">
+              <RoomCodeQR
+                hostelCode={hostel?.code || ""}
+                hostelName={hostel?.name}
+              />
               <ShareButton
                 hostelCode={hostel?.code || ""}
                 hostelName={hostel?.name || ""}
@@ -437,6 +442,10 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
             </div>
             {/* Mobile: share, theme, bell, menu in main navbar */}
             <div className="flex sm:hidden items-center gap-1">
+              <RoomCodeQR
+                hostelCode={hostel?.code || ""}
+                hostelName={hostel?.name}
+              />
               <ShareButton
                 hostelCode={hostel?.code || ""}
                 hostelName={hostel?.name || ""}

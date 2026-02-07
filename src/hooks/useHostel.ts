@@ -703,10 +703,11 @@ export const useUpdateHostel = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ hostelId, name, room_no }: { hostelId: string; name?: string; room_no?: string }) => {
+    mutationFn: async ({ hostelId, name, room_no, owner_id }: { hostelId: string; name?: string; room_no?: string; owner_id?: string | null }) => {
       const updateData: any = {};
       if (name !== undefined) updateData.name = name;
       if (room_no !== undefined) updateData.room_no = room_no;
+      if (owner_id !== undefined) updateData.owner_id = owner_id;
 
       const { data, error } = await supabase
         .from('hostels')

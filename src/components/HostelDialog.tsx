@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2, Users, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,15 +11,17 @@ interface HostelDialogProps {
   onHostelJoined: () => void;
   onClose: () => void;
   initialMode?: 'create' | 'join';
+  /** Pre-fill join code (e.g. from ?join= in URL / QR scan) */
+  initialJoinCode?: string;
 }
 
-export const HostelDialog = ({ onHostelJoined, onClose, initialMode = 'create' }: HostelDialogProps) => {
+export const HostelDialog = ({ onHostelJoined, onClose, initialMode = 'create', initialJoinCode = '' }: HostelDialogProps) => {
   const [mode, setMode] = useState<'create' | 'join'>(initialMode);
   const [hostelName, setHostelName] = useState('');
   const [roomNo, setRoomNo] = useState('');
   const [yourName, setYourName] = useState('');
   const [budget, setBudget] = useState('');
-  const [joinCode, setJoinCode] = useState('');
+  const [joinCode, setJoinCode] = useState(initialJoinCode.toUpperCase().slice(0, 6));
   const [isRoommate, setIsRoommate] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdCode, setCreatedCode] = useState('');
@@ -28,6 +30,10 @@ export const HostelDialog = ({ onHostelJoined, onClose, initialMode = 'create' }
   const createHostel = useCreateHostel();
   const joinHostel = useJoinHostel();
   const { data: foundHostel, isLoading: searchingHostel } = useHostelByCode(joinCode);
+
+  useEffect(() => {
+    if (initialJoinCode) setJoinCode(initialJoinCode.toUpperCase().slice(0, 6));
+  }, [initialJoinCode]);
 
   // Reset form fields
   const resetForm = () => {
