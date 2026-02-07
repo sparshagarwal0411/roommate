@@ -421,8 +421,14 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
                 <TooltipContent><p>{isOwner ? "Delete Hostel" : "Leave Hostel"}</p></TooltipContent>
               </Tooltip>
             </div>
-            {/* Mobile: menu sheet + bell only */}
+            {/* Mobile: share, theme, bell, menu in main navbar */}
             <div className="flex sm:hidden items-center gap-1">
+              <ShareButton
+                hostelCode={hostel?.code || ""}
+                hostelName={hostel?.name || ""}
+                roomNo={hostel?.room_no}
+              />
+              <ThemeToggle />
               <NotificationBell
                 memberId={me?.id || null}
                 onNavigateTo={(view, subTab) => {
@@ -452,11 +458,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
                     ))}
                   </div>
                   <div className="border-t pt-4 flex flex-col gap-1">
-                    <div className="w-full [&_button]:w-full [&_button]:justify-start">
-                      <ShareButton hostelCode={hostel?.code || ""} hostelName={hostel?.name || ""} roomNo={hostel?.room_no} />
-                    </div>
                     {isOwner && me && <BroadcastDialog members={members} currentMemberId={me.id} />}
-                    <ThemeToggle />
                     <UserMenu />
                     {isOwner && (
                       <Button variant="ghost" size="sm" className="justify-start text-warning" onClick={handleResetBalances} disabled={resetBalances.isPending}>
