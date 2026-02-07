@@ -44,7 +44,8 @@ import {
   useSettlements,
   useUpdateMember,
   Hostel,
-  useResetBalances
+  useResetBalances,
+  useComplaints
 } from "@/hooks/useHostel";
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,6 +56,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface DashboardProps {
@@ -70,6 +72,7 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
   const { data: recurringBills = [], isLoading: recurringBillsLoading } = useRecurringBills(hostelId);
   const { data: incomes = [], isLoading: incomesLoading } = useIncomes(hostelId);
   const { data: settlements = [], isLoading: settlementsLoading } = useSettlements(hostelId);
+  const { data: complaints = [] } = useComplaints(hostelId);
 
   const removeMember = useRemoveMember();
   const deleteHostel = useDeleteHostel();
@@ -289,6 +292,10 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
     );
   }
 
+  const unreadComplaintsCount = isOwner
+    ? complaints.filter((c) => c.status !== "resolved").length
+    : 0;
+
   const navItems: { value: typeof viewMode; label: string; icon: React.ReactNode }[] = [
     { value: "current", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
     { value: "history", label: "History", icon: <History className="h-5 w-5" /> },
@@ -398,7 +405,14 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
                 <TabsList className="bg-muted/50">
                   <TabsTrigger value="current" className="text-xs">Dashboard</TabsTrigger>
                   <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
-                  <TabsTrigger value="complaints" className="text-xs">Complaints</TabsTrigger>
+                  <TabsTrigger value="complaints" className="text-xs relative">
+                    Complaints
+                    {isOwner && unreadComplaintsCount > 0 && (
+                      <Badge variant="destructive" className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center p-0 text-[10px] font-bold">
+                        {unreadComplaintsCount > 99 ? "99+" : unreadComplaintsCount}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
                   <TabsTrigger value="mess" className="text-xs">Mess</TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -449,17 +463,26 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
                       <Button
                         key={item.value}
                         variant={viewMode === item.value ? "secondary" : "ghost"}
-                        className="justify-start gap-3"
+                        className="justify-start gap-3 relative"
                         onClick={() => setViewMode(item.value)}
                       >
-                        {item.icon}
+                        <span className="relative inline-flex">
+                          {item.icon}
+                          {item.value === "complaints" && isOwner && unreadComplaintsCount > 0 && (
+                            <Badge variant="destructive" className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center p-0 text-[10px] font-bold">
+                              {unreadComplaintsCount > 99 ? "99+" : unreadComplaintsCount}
+                            </Badge>
+                          )}
+                        </span>
                         {item.label}
                       </Button>
                     ))}
                   </div>
                   <div className="border-t pt-4 flex flex-col gap-1">
                     {isOwner && me && <BroadcastDialog members={members} currentMemberId={me.id} />}
-                    <UserMenu />
+                    <div className="w-full [&_button]:w-full [&_button]:justify-start">
+                      <UserMenu showLabel />
+                    </div>
                     {isOwner && (
                       <Button variant="ghost" size="sm" className="justify-start text-warning" onClick={handleResetBalances} disabled={resetBalances.isPending}>
                         <DoorOpen className="h-5 w-5 rotate-180 mr-3" /> Reset Balances
@@ -486,11 +509,18 @@ export const Dashboard = ({ hostelId, onLeave }: DashboardProps) => {
               type="button"
               onClick={() => setViewMode(item.value)}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors",
+                "flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors relative",
                 viewMode === item.value ? "text-primary bg-primary/10" : "text-muted-foreground"
               )}
             >
-              {item.icon}
+              <span className="relative inline-flex">
+                {item.icon}
+                {item.value === "complaints" && isOwner && unreadComplaintsCount > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] flex items-center justify-center p-0 text-[9px] font-bold">
+                    {unreadComplaintsCount > 99 ? "99+" : unreadComplaintsCount}
+                  </Badge>
+                )}
+              </span>
               <span>{item.label}</span>
             </button>
           ))}

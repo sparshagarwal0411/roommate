@@ -12,7 +12,12 @@ import { Button } from "@/components/ui/button";
 import { User, LogOut, Settings, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 
-export const UserMenu = () => {
+interface UserMenuProps {
+    /** When true, trigger shows icon + "Profile" text (e.g. for option bar / sheet) */
+    showLabel?: boolean;
+}
+
+export const UserMenu = ({ showLabel }: UserMenuProps) => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -29,8 +34,13 @@ export const UserMenu = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full w-10 h-10 border-2 border-primary/20 hover:border-primary/50 transition-colors">
-                    <User className="h-5 w-5" />
+                <Button
+                    variant="ghost"
+                    size={showLabel ? "default" : "icon"}
+                    className={showLabel ? "w-full justify-start gap-3 rounded-xl h-10 border-2 border-primary/20 hover:border-primary/50" : "rounded-full w-10 h-10 border-2 border-primary/20 hover:border-primary/50 transition-colors"}
+                >
+                    <User className="h-5 w-5 shrink-0" />
+                    {showLabel && <span>Profile</span>}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 mt-2">

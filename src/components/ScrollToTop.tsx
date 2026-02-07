@@ -28,7 +28,7 @@ export const ScrollToTop = () => {
       variant="floating"
       size="icon"
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-50 rounded-full shadow-elevated animate-fade-in"
+      className="fixed bottom-20 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 sm:bottom-6 z-50 rounded-full shadow-elevated animate-fade-in"
       aria-label="Scroll to top"
     >
       <ArrowUp className="h-5 w-5" />
